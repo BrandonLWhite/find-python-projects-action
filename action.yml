@@ -8,6 +8,8 @@ inputs:
 outputs:
   time: # output will be available to future steps
     description: 'The current time after waiting'
+  projects:
+    description: 'TODO: JSON object with array of projects.'
 runs:
   using: 'node16'
   main: 'dist/index.js'
