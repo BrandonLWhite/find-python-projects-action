@@ -18,6 +18,8 @@ module.exports = async function findPythonProjects(rootPath) {
     }
 
     const candidatePaths = await globby("**/pyproject.toml", globbyOpts)
+
+    projects = []
     pyprojectPaths = []
 
     for await (const candidatePath of candidatePaths) {
@@ -25,12 +27,22 @@ module.exports = async function findPythonProjects(rootPath) {
         projectToml = await fs.readFile(pyprojectPath)
         projectTomlParsed = await TOML.parse(projectToml)
 
-        if (projectTomlParsed['build-system']) {
+        buildSystem = projectTomlParsed['build-system']
+        if (buildSystem) {
+            buildBackend = buildSystem['build-backend']
+            testCommand = projectTomlParsed?.project?.tasks?.test
+
+            projects.push({
+                path: pyprojectPath,
+                buildBackend: buildBackend,
+                testCommand: testCommand
+            })
             pyprojectPaths.push(pyprojectPath)
         }
     }
 
     return {
+        projects: projects,
         paths: pyprojectPaths
     }
 }
