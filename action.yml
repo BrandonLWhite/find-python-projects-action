@@ -1,15 +1,13 @@
-name: 'Wait'
-description: 'Wait a designated number of milliseconds'
+name: 'Find Python Projects'
+description: 'TODO Description'
 inputs:
-  milliseconds:  # id of input
-    description: 'number of milliseconds to wait'
-    required: true
-    default: '1000'
+  root_path:
+    description: 'TODO Description'
+    required: false
+    default: ''
 outputs:
-  time: # output will be available to future steps
-    description: 'The current time after waiting'
-  projects:
-    description: 'TODO: JSON object with array of projects.'
+  paths:
+    description: 'TODO: JSON object with array of projects paths'
 runs:
   using: 'node16'
   main: 'dist/index.js'

@@ -4,14 +4,28 @@ const globby = require('globby')
 const TOML = require('@iarna/toml')
 
 module.exports = async function findPythonProjects(rootPath) {
-    const pyprojectPaths = await globby("**/pyproject.toml", {
-        cwd: rootPath,
+    globbyOpts = {
         gitignore: true
-    })
-    console.log(pyprojectPaths)
-    for await (const pyprojectPath of pyprojectPaths) {
-        projectToml = await fs.readFile(path.join(rootPath, pyprojectPath))
+    }
+    if (rootPath) {
+        globbyOpts.cwd = rootPath
+    }
+
+    const candidatePaths = await globby("**/pyproject.toml", globbyOpts)
+    pyprojectPaths = []
+
+    for await (const candidatePath of candidatePaths) {
+        pyprojectPath = path.join(rootPath, candidatePath)
+        projectToml = await fs.readFile(pyprojectPath)
         projectTomlParsed = await TOML.parse(projectToml)
-        console.log(projectTomlParsed)
+
+        if (projectTomlParsed['build-system']) {
+            pyprojectPaths.push(pyprojectPath)
+        }
+    }
+
+    console.log(pyprojectPaths)
+    return {
+        paths: pyprojectPaths
     }
 }
