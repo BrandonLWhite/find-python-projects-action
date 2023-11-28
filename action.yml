@@ -2,14 +2,20 @@ name: 'Find Python Projects'
 description: 'TODO Description'
 
 inputs:
-  root_path:
+  root-path:
     description: 'TODO Description'
     required: false
     default: ''
 
 outputs:
+  projects:
+    description: 'TODO'
+
   paths:
-    description: 'TODO: JSON object with array of projects paths'
+    description: 'TODO: JSON array of projects paths'
+
+  testable-projects:
+    description: 'TODO'
 
 runs:
   using: 'node16'

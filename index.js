@@ -1,18 +1,19 @@
 const core = require('@actions/core');
 const findPythonProjects = require('./find-python-projects')
 
-// most @actions toolkit packages have async methods
 async function run() {
   try {
-    const root_path = core.getInput('root_path');
-    core.info(`Searching in "${root_path}" ...`);
+    const rootPath = core.getInput('root-path');
+    core.info(`Searching in "${rootPath}" ...`);
 
-    // core.debug();
+    output = await findPythonProjects(rootPath)
 
-    output = await findPythonProjects(root_path)
-    console.log(output.paths)
-    console.log(JSON.stringify(output.paths))
+    console.log(output)
+    // console.log(JSON.stringify(output.paths))
+
+    core.setOutput('projects', JSON.stringify(output.projects));
     core.setOutput('paths', JSON.stringify(output.paths));
+    core.setOutput('testable-projects', JSON.stringify(output.testableProjects));
 
   } catch (error) {
     core.setFailed(error.message);
