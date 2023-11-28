@@ -13391,7 +13391,7 @@ async function run() {
     // core.debug();
 
     output = findPythonProjects(root_path)
-    core.setOutput('paths', output.paths);
+    core.setOutput('paths', JSON.stringify(output.paths));
 
   } catch (error) {
     core.setFailed(error.message);
