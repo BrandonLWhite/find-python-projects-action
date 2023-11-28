@@ -38,6 +38,7 @@ module.exports = async function findPythonProjects(rootPath) {
                 path: pyprojectPath,
                 directory: path.dirname(pyprojectPath),
                 buildBackend: buildBackend,
+                installCommand: installCommand,
                 testCommand: testCommand,
                 packageCommand: "TODO"
             })

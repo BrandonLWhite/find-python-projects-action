@@ -5,7 +5,7 @@ inputs:
   root-path:
     description: 'TODO Description'
     required: false
-    default: ''
+    default: '.'
 
 outputs:
   projects:
