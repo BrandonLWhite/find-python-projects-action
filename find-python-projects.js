@@ -27,7 +27,7 @@ module.exports = async function findPythonProjects(rootPath) {
             installCommand = usePoetry ? 'poetry install' : 'pip install'
             testCommand = projectTomlParsed?.project?.tasks?.test
 
-            if (usePoetry) {
+            if (testCommand && usePoetry) {
                 testCommand = `poetry run ${testCommand}`
             }
 
