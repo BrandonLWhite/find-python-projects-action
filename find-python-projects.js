@@ -24,7 +24,6 @@ module.exports = async function findPythonProjects(rootPath) {
         }
     }
 
-    console.log(pyprojectPaths)
     return {
         paths: pyprojectPaths
     }

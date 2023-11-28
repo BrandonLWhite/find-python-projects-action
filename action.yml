@@ -1,13 +1,16 @@
 name: 'Find Python Projects'
 description: 'TODO Description'
+
 inputs:
   root_path:
     description: 'TODO Description'
     required: false
     default: ''
+
 outputs:
   paths:
     description: 'TODO: JSON object with array of projects paths'
+
 runs:
   using: 'node16'
   main: 'dist/index.js'

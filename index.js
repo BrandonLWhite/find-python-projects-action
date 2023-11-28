@@ -10,6 +10,8 @@ async function run() {
     // core.debug();
 
     output = findPythonProjects(root_path)
+    console.log(output.paths)
+    console.log(JSON.stringify(output.paths))
     core.setOutput('paths', JSON.stringify(output.paths));
 
   } catch (error) {
