@@ -31,8 +31,12 @@ module.exports = async function findPythonProjects(rootPath) {
                 testCommand = `poetry run ${testCommand}`
             }
 
+            projectName = projectTomlParsed?.tool?.poetry?.name || projectTomlParsed?.project?.name
+
             projects.push({
+                name: projectName,
                 path: pyprojectPath,
+                directory: path.dirname(pyprojectPath),
                 buildBackend: buildBackend,
                 testCommand: testCommand,
                 packageCommand: "TODO"
