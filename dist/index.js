@@ -20,7 +20,6 @@ module.exports = async function findPythonProjects(rootPath) {
     const candidatePaths = await globby("**/pyproject.toml", globbyOpts)
 
     projects = []
-    pyprojectPaths = []
 
     for await (const candidatePath of candidatePaths) {
         pyprojectPath = path.join(rootPath, candidatePath)
@@ -30,20 +29,27 @@ module.exports = async function findPythonProjects(rootPath) {
         buildSystem = projectTomlParsed['build-system']
         if (buildSystem) {
             buildBackend = buildSystem['build-backend']
+            usePoetry = (buildBackend || '').startsWith('poetry')
+            installCommand = usePoetry ? 'poetry install' : 'pip install'
             testCommand = projectTomlParsed?.project?.tasks?.test
+
+            if (usePoetry) {
+                testCommand = `poetry run ${testCommand}`
+            }
 
             projects.push({
                 path: pyprojectPath,
                 buildBackend: buildBackend,
-                testCommand: testCommand
+                testCommand: testCommand,
+                packageCommand: "TODO"
             })
-            pyprojectPaths.push(pyprojectPath)
         }
     }
 
     return {
         projects: projects,
-        paths: pyprojectPaths
+        paths: projects.map(project => project.path),
+        testableProjects: projects.filter(project => project.testCommand)
     }
 }
 
