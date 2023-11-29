@@ -8,12 +8,10 @@ async function run() {
 
     output = await findPythonProjects(rootPath)
 
-    console.log(output)
-    // console.log(JSON.stringify(output.paths))
-
     core.setOutput('projects', JSON.stringify(output.projects));
     core.setOutput('paths', JSON.stringify(output.paths));
     core.setOutput('testable-projects', JSON.stringify(output.testableProjects));
+    core.setOutput('packageable-projects', JSON.stringify(output.packageableProjects));
 
   } catch (error) {
     core.setFailed(error.message);

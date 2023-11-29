@@ -17,6 +17,9 @@ outputs:
   testable-projects:
     description: 'TODO'
 
+  packageable-projects:
+    description: 'TODO'
+
 runs:
   using: 'node16'
   main: 'dist/index.js'
