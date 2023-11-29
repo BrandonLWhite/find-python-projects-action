@@ -27,6 +27,8 @@ module.exports = async function findPythonProjects(rootPath) {
         projectTomlParsed = await TOML.parse(projectToml)
 
         buildSystem = projectTomlParsed['build-system']
+        // TODO BW: Remove this as a conditional, because top-level pyproject.toml could specify a test command
+        // for tox.
         if (buildSystem) {
             buildBackend = buildSystem['build-backend']
             usePoetry = (buildBackend || '').startsWith('poetry')
@@ -38,12 +40,14 @@ module.exports = async function findPythonProjects(rootPath) {
             }
 
             projectName = projectTomlParsed?.tool?.poetry?.name || projectTomlParsed?.project?.name
+            pythonVersion = projectTomlParsed?.project?.['requires-python'] || projectTomlParsed?.tool?.poetry?.dependencies?.python
 
             projects.push({
                 name: projectName,
                 path: pyprojectPath,
                 directory: path.dirname(pyprojectPath),
                 buildBackend: buildBackend,
+                pythonVersion: pythonVersion,
                 installCommand: installCommand,
                 testCommand: testCommand,
                 packageCommand: "TODO"
