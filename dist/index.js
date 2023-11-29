@@ -29,10 +29,9 @@ module.exports = async function findPythonProjects(rootPath) {
         projectName = projectTomlParsed?.tool?.poetry?.name || projectTomlParsed?.project?.name
         pythonVersion = projectTomlParsed?.project?.['requires-python'] || projectTomlParsed?.tool?.poetry?.dependencies?.python
 
-        buildSystem = projectTomlParsed['build-system']
-        buildBackend = buildSystem['build-backend']
+        buildBackend = projectTomlParsed?.['build-system']?.['build-backend']
         usePoetry = (buildBackend || '').startsWith('poetry')
-        installCommand = usePoetry ? 'poetry install' : 'pip install'
+        installCommand = buildBackend && (usePoetry ? 'poetry install' : 'pip install')
         testCommand = projectTomlParsed?.project?.tasks?.test
         packageCommand = projectTomlParsed?.project?.tasks?.package
 
