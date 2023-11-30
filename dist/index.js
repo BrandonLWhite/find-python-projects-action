@@ -70,7 +70,7 @@ const PYTHON_VERSION_PATHS = [
 ];
 
 const TEST_COMMAND_PATHS = [
-    'project.tasks.test',
+    'tool.tasks.test',
     'tool.poe.tasks.test'
 ];
 
