@@ -35,6 +35,7 @@ module.exports = async function findPythonProjects(rootPath) {
         installCommand = buildBackend && (usePoetry ? 'poetry install' : 'pip install');
         testCommand = get_best_config(projectTomlParsed, TEST_COMMAND_PATHS);
         packageCommand = projectTomlParsed?.project?.tasks?.package;
+        useTox = testCommand && command_regex('tox').test(testCommand);
 
         projects.push({
             name: projectName,
@@ -44,7 +45,9 @@ module.exports = async function findPythonProjects(rootPath) {
             pythonVersion: pythonVersion,
             installCommand: installCommand,
             testCommand: testCommand,
-            packageCommand: packageCommand
+            packageCommand: packageCommand,
+            usePoetry: usePoetry,
+            useTox: useTox
         });
     }
 
@@ -62,6 +65,10 @@ function get_best_config(configRoot, knownPaths, defaultValue = null) {
         if (value) return value;
     }
     return defaultValue;
+}
+
+function command_regex(command) {
+    return new RegExp(`(^|[\s'"])${command}($|[\s'"])`);
 }
 
 const PYTHON_VERSION_PATHS = [
