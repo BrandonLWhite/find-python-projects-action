@@ -6,7 +6,7 @@ async function run() {
     const rootPath = core.getInput('root-path');
     core.info(`Searching in "${rootPath}" ...`);
 
-    output = await findPythonProjects(rootPath)
+    output = await findPythonProjects(rootPath);
 
     core.setOutput('projects', JSON.stringify(output.projects));
     core.setOutput('paths', JSON.stringify(output.paths));
