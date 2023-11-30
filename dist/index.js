@@ -34,7 +34,7 @@ module.exports = async function findPythonProjects(rootPath) {
         usePoetry = (buildBackend || '').startsWith('poetry');
         installCommand = buildBackend && (usePoetry ? 'poetry install' : 'pip install');
         testCommand = get_best_config(projectTomlParsed, TEST_COMMAND_PATHS);
-        packageCommand = projectTomlParsed?.project?.tasks?.package;
+        packageCommand = get_best_config(projectTomlParsed, PACKAGE_COMMAND_PATHS);
         useTox = testCommand && command_regex('tox').test(testCommand);
 
         projects.push({
@@ -79,6 +79,11 @@ const PYTHON_VERSION_PATHS = [
 const TEST_COMMAND_PATHS = [
     'tool.tasks.test',
     'tool.poe.tasks.test'
+];
+
+const PACKAGE_COMMAND_PATHS = [
+    'tool.tasks.package',
+    'tool.poe.tasks.package'
 ];
 
 /***/ }),
