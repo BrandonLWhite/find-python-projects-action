@@ -11,7 +11,7 @@ const TOML = __nccwpck_require__(2901);
 const _get = __nccwpck_require__(6908);
 
 module.exports = async function findPythonProjects(rootPath) {
-    globbyOpts = {
+    const globbyOpts = {
         gitignore: true
     }
     if (rootPath) {
@@ -20,22 +20,21 @@ module.exports = async function findPythonProjects(rootPath) {
 
     const candidatePaths = await globby("**/pyproject.toml", globbyOpts);
 
-    projects = [];
+    const projects = [];
 
     for await (const candidatePath of candidatePaths) {
-        pyprojectPath = path.join(rootPath, candidatePath);
-        projectToml = await fs.readFile(pyprojectPath);
-        projectTomlParsed = await TOML.parse(projectToml);
+        const pyprojectPath = path.join(rootPath, candidatePath);
+        const projectToml = await fs.readFile(pyprojectPath);
+        const projectTomlParsed = TOML.parse(projectToml);
 
-        projectName = projectTomlParsed?.tool?.poetry?.name || projectTomlParsed?.project?.name;
-        pythonVersion = get_best_config(projectTomlParsed, PYTHON_VERSION_PATHS);
+        const projectName = projectTomlParsed?.tool?.poetry?.name || projectTomlParsed?.project?.name;
+        const pythonVersion = get_best_config(projectTomlParsed, PYTHON_VERSION_PATHS);
 
-        buildBackend = projectTomlParsed?.['build-system']?.['build-backend'];
-        usePoetry = (buildBackend || '').startsWith('poetry');
-        installCommand = buildBackend && (usePoetry ? 'poetry install' : 'pip install');
-        testCommand = get_best_config(projectTomlParsed, TEST_COMMAND_PATHS);
-        packageCommand = get_best_config(projectTomlParsed, PACKAGE_COMMAND_PATHS);
-        useTox = testCommand && command_regex('tox').test(testCommand);
+        const buildBackend = projectTomlParsed?.['build-system']?.['build-backend'];
+        const usePoetry = (buildBackend || '').startsWith('poetry');
+        const installCommand = buildBackend && (usePoetry ? 'poetry install' : 'pip install');
+        const testCommand = get_best_config(projectTomlParsed, TEST_COMMAND_PATHS);
+        const packageCommand = get_best_config(projectTomlParsed, PACKAGE_COMMAND_PATHS);
 
         projects.push({
             name: projectName,
@@ -45,9 +44,7 @@ module.exports = async function findPythonProjects(rootPath) {
             pythonVersion: pythonVersion,
             installCommand: installCommand,
             testCommand: testCommand,
-            packageCommand: packageCommand,
-            usePoetry: usePoetry,
-            useTox: useTox
+            packageCommand: packageCommand
         });
     }
 
@@ -61,24 +58,21 @@ module.exports = async function findPythonProjects(rootPath) {
 
 function get_best_config(configRoot, knownPaths, defaultValue = null) {
     for (const knownPath of knownPaths) {
-        value = _get(configRoot, knownPath);
+        const value = _get(configRoot, knownPath);
         if (value) return value;
     }
     return defaultValue;
 }
 
-function command_regex(command) {
-    return new RegExp(`(^|[\s'"])${command}($|[\s'"])`);
-}
-
 const PYTHON_VERSION_PATHS = [
-    'project.requires-python',
+    'project.requires-python', // PEP-621
     'tool.poetry.dependencies.python'
 ];
 
 const TEST_COMMAND_PATHS = [
     'tool.tasks.test',
-    'tool.poe.tasks.test'
+    'tool.poe.tasks.test',
+    'tool.invoke.tasks.test'
 ];
 
 const PACKAGE_COMMAND_PATHS = [
@@ -15047,7 +15041,7 @@ async function run() {
     const rootPath = core.getInput('root-path');
     core.info(`Searching in "${rootPath}" ...`);
 
-    output = await findPythonProjects(rootPath);
+    const output = await findPythonProjects(rootPath);
 
     core.setOutput('projects', JSON.stringify(output.projects));
     core.setOutput('paths', JSON.stringify(output.paths));
