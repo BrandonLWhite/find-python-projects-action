@@ -14,11 +14,6 @@ describe('find-python-projects', () => {
   let inputs = {}
   let outputs = {}
 
-  // core.setOutput('projects', JSON.stringify(output.projects));
-  // core.setOutput('paths', JSON.stringify(output.paths));
-  // core.setOutput('testable-projects', JSON.stringify(output.testableProjects));
-  // core.setOutput('packageable-projects', JSON.stringify(output.packageableProjects));
-
   beforeEach(() => {
     jest.clearAllMocks()
     inputs = {
@@ -41,6 +36,13 @@ describe('find-python-projects', () => {
     await run();
     expect(deserializeJsonValues(outputs)).toMatchSnapshot();
   });
+
+  it('Calls setFailed on error', async () => {
+    inputs['root-dir'] = 'test-fixtures/invalid-project'
+    await run();
+    expect(setFailedMock).toHaveBeenCalled();
+  });
+
 });
 
 
