@@ -4,12 +4,12 @@ const globby = require('globby');
 const TOML = require('@iarna/toml');
 const _get = require('lodash/get');
 
-module.exports = async function findPythonProjects(rootPath) {
+module.exports = async function findPythonProjects(rootDir) {
     const globbyOpts = {
         gitignore: true
     }
-    if (rootPath) {
-        globbyOpts.cwd = rootPath
+    if (rootDir) {
+        globbyOpts.cwd = rootDir
     }
 
     const candidatePaths = await globby("**/pyproject.toml", globbyOpts);
@@ -17,7 +17,7 @@ module.exports = async function findPythonProjects(rootPath) {
     const projects = [];
 
     for await (const candidatePath of candidatePaths) {
-        const pyprojectPath = path.join(rootPath, candidatePath);
+        const pyprojectPath = path.join(rootDir, candidatePath);
         const projectToml = await fs.readFile(pyprojectPath);
         const projectTomlParsed = TOML.parse(projectToml);
 

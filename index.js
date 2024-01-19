@@ -3,10 +3,10 @@ const findPythonProjects = require('./find-python-projects')
 
 async function run() {
   try {
-    const rootPath = core.getInput('root-path');
-    core.info(`Searching in "${rootPath}" ...`);
+    const rootDir = core.getInput('root-dir');
+    core.info(`Searching in "${rootDir}" ...`);
 
-    const output = await findPythonProjects(rootPath);
+    const output = await findPythonProjects(rootDir);
 
     core.setOutput('projects', JSON.stringify(output.projects));
     core.setOutput('paths', JSON.stringify(output.paths));

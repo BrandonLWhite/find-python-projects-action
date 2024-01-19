@@ -10,12 +10,12 @@ const globby = __nccwpck_require__(3398);
 const TOML = __nccwpck_require__(2901);
 const _get = __nccwpck_require__(6908);
 
-module.exports = async function findPythonProjects(rootPath) {
+module.exports = async function findPythonProjects(rootDir) {
     const globbyOpts = {
         gitignore: true
     }
-    if (rootPath) {
-        globbyOpts.cwd = rootPath
+    if (rootDir) {
+        globbyOpts.cwd = rootDir
     }
 
     const candidatePaths = await globby("**/pyproject.toml", globbyOpts);
@@ -23,7 +23,7 @@ module.exports = async function findPythonProjects(rootPath) {
     const projects = [];
 
     for await (const candidatePath of candidatePaths) {
-        const pyprojectPath = path.join(rootPath, candidatePath);
+        const pyprojectPath = path.join(rootDir, candidatePath);
         const projectToml = await fs.readFile(pyprojectPath);
         const projectTomlParsed = TOML.parse(projectToml);
 
@@ -15038,10 +15038,10 @@ const findPythonProjects = __nccwpck_require__(7875)
 
 async function run() {
   try {
-    const rootPath = core.getInput('root-path');
-    core.info(`Searching in "${rootPath}" ...`);
+    const rootDir = core.getInput('root-dir');
+    core.info(`Searching in "${rootDir}" ...`);
 
-    const output = await findPythonProjects(rootPath);
+    const output = await findPythonProjects(rootDir);
 
     core.setOutput('projects', JSON.stringify(output.projects));
     core.setOutput('paths', JSON.stringify(output.paths));

@@ -1,25 +1,25 @@
-name: 'Find Python Projects'
-description: 'TODO Description'
+name: Find Python Projects
+description: Discovers Python sub-projects in a monorepo workspace project
 
 inputs:
-  root-path:
-    description: 'TODO Description'
+  root-dir:
+    description: Directory root for where to begin recursively searching for projects.  Python projects contained in this directory or lower will be discovered.
     required: false
     default: '.'
 
 outputs:
-  projects:
-    description: 'TODO'
-
   paths:
-    description: 'TODO: JSON array of projects paths'
+    description: JSON array of found project path strings
+
+  projects:
+    description: JSON array of all found projects (`project` object)
 
   testable-projects:
-    description: 'TODO'
+    description: JSON array of all found projects (`project` object) that implement a `test` command
 
   packageable-projects:
-    description: 'TODO'
+    description: JSON array of all found projects (`project` object) that implement a `package` command
 
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'dist/index.js'
