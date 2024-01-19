@@ -1,7 +1,7 @@
 const core = require('@actions/core')
 const mapValues = require('lodash/mapValues')
 
-const { run, findPythonProjects } = require('./find-python-projects');
+const { run } = require('./find-python-projects');
 
 describe('find-python-projects', () => {
 
@@ -35,6 +35,7 @@ describe('find-python-projects', () => {
     inputs['root-dir'] = 'test-fixtures/multi-project'
     await run();
     expect(deserializeJsonValues(outputs)).toMatchSnapshot();
+    expect(infoMock).toHaveBeenCalled();
   });
 
   it('Calls setFailed on error', async () => {
@@ -44,7 +45,6 @@ describe('find-python-projects', () => {
   });
 
 });
-
 
 function deserializeJsonValues(obj) {
   return mapValues(obj, val => JSON.parse(val))
