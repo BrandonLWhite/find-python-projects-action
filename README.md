@@ -1,119 +1,65 @@
-# Create a JavaScript Action
+# find-python-projects-action
+Github Action for dynamically discovering Python projects in a repository and making available some helpful values from `pyproject.toml` for each project it finds.
+
+Python projects are identified by the presence of `pyproject.toml`.
+Various pieces of information about each project are parsed from `pyproject.toml` and returned in the action outputs, including shell commands for additional CI type operations like `test` and `package`.
+This is meant to faciliate downstream actions or workflows such as matrix builds for parallel builds of each project.
+
+This action aims to help you eliminate (or at least reduce) the amount of customization needed in your GHA workflows by pushing your project-specific stuff into `pyproject.toml`.
+
+
+## Inputs
+- **root-dir**: Directory root for where to begin recursively searching for projects.
+Python projects contained in this directory or lower will be discovered.  Defaults to your repository's root directory.
+
+
+## Outputs
+- **paths**: JSON array of found project path strings
+
+- **projects**: JSON array of all found projects (`project` object)
+
+- **testable-projects**: JSON array of all found projects (`project` object) that implement a `test` command in `pyproject.toml` (See [Project Commands](#project-commands))
+
+- **packageable-projects**: JSON array of all found projects (`project` object) that implement a `package` command in `pyproject.toml` (See [Project Commands](#project-commands))
+
+
+## Project output shape.
 
 TODO: `project` object shape.
-TODO: Project commands, tool.tasks.*, and supported task runners.
 
-<p align="center">
-  <a href="https://github.com/actions/javascript-action/actions"><img alt="javscript-action status" src="https://github.com/actions/javascript-action/workflows/units-test/badge.svg"></a>
-</p>
 
-Use this template to bootstrap the creation of a JavaScript action.:rocket:
+### Project Commands
+In the absence of Python standards for expressing internal project CI/CD/Dev operations, this action tries to unify the various known ways in the wild.
 
-This template includes tests, linting, a validation workflow, publishing, and versioning guidance.
+This action recognizes the following typical CI related shell commands:
 
-If you are new, there's also a simpler introduction.  See the [Hello World JavaScript Action](https://github.com/actions/hello-world-javascript-action)
+- `test`
+- `package`
 
-## Create an action from this template
+In order to make these commands available in the action output, you'll need to define them in `pyproject.toml` using a section appropriate for the particular tools you are using in the project.  You can specify all, some, or none, depending on what you need available.
 
-Click the `Use this Template` and provide the new repo details for your action
+This action will pull the command from the first entry it finds in any of the following sections in `pyproject.toml`:
+- `[tool.tasks]`
+- `[tool.pdm.scripts]`
+- `[tool.poe.tasks]`
+- `[tool.invoke.tasks]`
 
-## Code in Main
 
-Install the dependencies
+#### Where is the support for `[tool.poetry.scripts]`?
+Unfortunately, [Poetry scripts](https://python-poetry.org/docs/pyproject/#scripts) is for specifying commands that are made available to consumers of a package.  It isn't meant for CI/CD or developer operations and doesn't meet those needs, primarily because any scripts you define in this section will be added as executable shortcuts to your virtual environment or any virtual environment your package is installed into.
+If you are using Poetry and want to take advantage of this feature from this action, use the catch-all `[tool.tasks]` section.  Alternatively, you
+can leverage a task runner tool like [Poe](https://github.com/nat-n/poethepoet) or [Invoke](https://www.pyinvoke.org/)
 
-```bash
-npm install
-```
+*If Poetry ever adds support for internal project (CI/CD/Dev) commands separate from published commands, then it will be added to this action.*
 
-Run the tests :heavy_check_mark:
 
-```bash
-$ npm test
+#### Relevant References / Discussions
+https://discuss.python.org/t/a-new-pep-to-specify-dev-scripts-and-or-dev-scripts-providers-in-pyproject-toml/11457
 
- PASS  ./index.test.js
-  ✓ throws invalid number (3ms)
-  ✓ wait 500 ms (504ms)
-  ✓ test runs (95ms)
-...
-```
+https://discuss.python.org/t/proposal-for-tests-entry-point-in-pyproject-toml/2077
 
-## Change action.yml
+https://stackoverflow.com/questions/70386944/how-should-poetry-scripts-used-in-the-build-process-be-stored-in-the-project
 
-The action.yml defines the inputs and output for your action.
+https://github.com/python-poetry/poetry/issues/3386
 
-Update the action.yml with your name, description, inputs and outputs for your action.
-
-See the [documentation](https://help.github.com/en/articles/metadata-syntax-for-github-actions)
-
-## Change the Code
-
-Most toolkit and CI/CD operations involve async operations so the action is run in an async function.
-
-```javascript
-const core = require('@actions/core');
-...
-
-async function run() {
-  try {
-      ...
-  }
-  catch (error) {
-    core.setFailed(error.message);
-  }
-}
-
-run()
-```
-
-See the [toolkit documentation](https://github.com/actions/toolkit/blob/master/README.md#packages) for the various packages.
-
-## Package for distribution
-
-GitHub Actions will run the entry point from the action.yml. Packaging assembles the code into one file that can be checked in to Git, enabling fast and reliable execution and preventing the need to check in node_modules.
-
-Actions are run from GitHub repos.  Packaging the action will create a packaged action in the dist folder.
-
-Run prepare
-
-```bash
-npm run prepare
-```
-
-Since the packaged index.js is run from the dist folder.
-
-```bash
-git add dist
-```
-
-## Create a release branch
-
-Users shouldn't consume the action from master since that would be latest code and actions can break compatibility between major versions.
-
-Checkin to the v1 release branch
-
-```bash
-git checkout -b v1
-git commit -a -m "v1 release"
-```
-
-```bash
-git push origin v1
-```
-
-Note: We recommend using the `--license` option for ncc, which will create a license file for all of the production node modules used in your project.
-
-Your action is now published! :rocket:
-
-See the [versioning documentation](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md)
-
-## Usage
-
-You can now consume the action by referencing the v1 branch
-
-```yaml
-uses: actions/javascript-action@v1
-with:
-  milliseconds: 1000
-```
-
-See the [actions tab](https://github.com/actions/javascript-action/actions) for runs of this action! :rocket:
+## Example Workflow
