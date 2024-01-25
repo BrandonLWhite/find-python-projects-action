@@ -54,10 +54,9 @@ This action recognizes the following typical CI related shell commands:
 In order to make these commands available in the action output, you'll need to define them in `pyproject.toml` using a section appropriate for the particular tools you are using in the project.  You can specify all, some, or none, depending on what you need available.
 
 This action will pull the command from the first entry it finds in any of the following sections in `pyproject.toml`:
-- `[tool.tasks]`
-- `[tool.pdm.scripts]`
-- `[tool.poe.tasks]`
-- `[tool.invoke.tasks]`
+- `[tool.tasks]`: Use this field if you aren't already using a separate task runner tool, otherwise use the field that corresponds to that tool.
+- `[tool.pdm.scripts]`: [PDM](https://pdm-project.org/latest/usage/scripts/)
+- `[tool.poe.tasks]`: [poethepoet](https://github.com/nat-n/poethepoet)
 
 
 ### Where is the support for `[tool.poetry.scripts]`?
