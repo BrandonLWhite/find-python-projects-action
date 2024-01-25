@@ -1,0 +1,58 @@
+name: Example Workflow
+on:
+  pull_request
+jobs:
+  discover-python-projects:
+    name: Discover projects
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Discover Projects
+        id: discover
+        uses: BrandonLWhite/find-python-projects-action@main
+
+      - name: Print Paths
+        run: echo ${{steps.discover.outputs.paths }}
+
+    outputs:
+      testable-projects: ${{ steps.discover.outputs.testable-projects }}
+      packageable-projects: ${{ steps.discover.outputs.packageable-projects }}
+
+  build-python-projects:
+    name: "Test: ${{ matrix.project.name }}"
+    runs-on: ubuntu-latest
+    needs: discover-python-projects
+    strategy:
+      matrix:
+        project: ${{ fromJson(needs.discover-python-projects.outputs.testable-projects) }}
+
+    defaults:
+      run:
+        shell: bash
+        working-directory: ${{ matrix.project.directory }}
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Dump project object
+        run: |
+          echo '${{ toJson(matrix.project) }}'
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: ${{ matrix.project.path }}
+
+      - name: Install project
+        if: matrix.project.installCommand
+        run: ${{ matrix.project.installCommand }}
+
+      - name: Test project
+        run: ${{ matrix.project.testCommand }}
+
+      - name: Package project
+        if: matrix.project.packageCommand
+        run: ${{ matrix.project.packageCommand }}

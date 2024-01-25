@@ -4,38 +4,71 @@ require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /***/ 7875:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
+const core = __nccwpck_require__(2186);
+
 const fs = __nccwpck_require__(3292);
 const path = __nccwpck_require__(1017);
+
 const globby = __nccwpck_require__(3398);
 const TOML = __nccwpck_require__(2901);
 const _get = __nccwpck_require__(6908);
 
-module.exports = async function findPythonProjects(rootPath) {
-    globbyOpts = {
+module.exports = {
+    run,
+    findPythonProjects
+}
+
+async function run() {
+    try {
+      const rootDir = core.getInput('root-dir');
+      core.info(`Searching in "${rootDir}" ...`);
+
+      const output = await findPythonProjects(rootDir);
+
+      core.setOutput('projects', JSON.stringify(output.projects));
+      core.setOutput('paths', JSON.stringify(output.paths));
+      core.setOutput('testable-projects', JSON.stringify(output.testableProjects));
+      core.setOutput('packageable-projects', JSON.stringify(output.packageableProjects));
+
+    } catch (error) {
+      core.setFailed(error.message);
+    }
+  }
+
+async function findPythonProjects(rootDir) {
+    const globbyOpts = {
         gitignore: true
     }
-    if (rootPath) {
-        globbyOpts.cwd = rootPath
+    if (rootDir) {
+        globbyOpts.cwd = rootDir
     }
 
     const candidatePaths = await globby("**/pyproject.toml", globbyOpts);
 
-    projects = [];
+    const projects = [];
 
     for await (const candidatePath of candidatePaths) {
-        pyprojectPath = path.join(rootPath, candidatePath);
-        projectToml = await fs.readFile(pyprojectPath);
-        projectTomlParsed = await TOML.parse(projectToml);
+        const pyprojectPath = path.join(rootDir, candidatePath);
+        const projectToml = await fs.readFile(pyprojectPath);
+        const projectTomlParsed = TOML.parse(projectToml);
 
-        projectName = projectTomlParsed?.tool?.poetry?.name || projectTomlParsed?.project?.name;
-        pythonVersion = get_best_config(projectTomlParsed, PYTHON_VERSION_PATHS);
+        const projectName = get_best_config(projectTomlParsed, PROJECT_NAME_PATHS);
+        const pythonVersion = get_best_config(projectTomlParsed, PYTHON_VERSION_PATHS);
 
-        buildBackend = projectTomlParsed?.['build-system']?.['build-backend'];
-        usePoetry = (buildBackend || '').startsWith('poetry');
-        installCommand = buildBackend && (usePoetry ? 'poetry install' : 'pip install');
-        testCommand = get_best_config(projectTomlParsed, TEST_COMMAND_PATHS);
-        packageCommand = get_best_config(projectTomlParsed, PACKAGE_COMMAND_PATHS);
-        useTox = testCommand && command_regex('tox').test(testCommand);
+        const buildBackend = projectTomlParsed?.['build-system']?.['build-backend'];
+        const usePoetry = (buildBackend || '').startsWith('poetry');
+
+        // TODO: Figure out the best way to deal with this.  The issue is that some tools, like Poetry, need a separate
+        // `poetry install` before subsequent `poetry run ...` operations can take place.
+        // Best bet is to experiment with PDM to see how it behaves (eg does it automatically do an install when
+        // necessary as part of executing a task/script)
+        const installCommand = buildBackend && (usePoetry ? 'poetry install' : 'pip install');
+
+        // TODO : Need to make this more adaptive in how it resolves the final shell command.  For instance,
+        // if it is a POE command, the returned shell command should be `poe run test`.  Similarly for other
+        // task runners, including PDM (I think).
+        const testCommand = get_best_config(projectTomlParsed, TEST_COMMAND_PATHS);
+        const packageCommand = get_best_config(projectTomlParsed, PACKAGE_COMMAND_PATHS);
 
         projects.push({
             name: projectName,
@@ -45,9 +78,7 @@ module.exports = async function findPythonProjects(rootPath) {
             pythonVersion: pythonVersion,
             installCommand: installCommand,
             testCommand: testCommand,
-            packageCommand: packageCommand,
-            usePoetry: usePoetry,
-            useTox: useTox
+            packageCommand: packageCommand
         });
     }
 
@@ -61,29 +92,34 @@ module.exports = async function findPythonProjects(rootPath) {
 
 function get_best_config(configRoot, knownPaths, defaultValue = null) {
     for (const knownPath of knownPaths) {
-        value = _get(configRoot, knownPath);
+        const value = _get(configRoot, knownPath);
         if (value) return value;
     }
     return defaultValue;
 }
 
-function command_regex(command) {
-    return new RegExp(`(^|[\s'"])${command}($|[\s'"])`);
-}
+const PROJECT_NAME_PATHS = [
+    'project.name', // PEP-621
+    'tool.poetry.name'
+];
 
 const PYTHON_VERSION_PATHS = [
-    'project.requires-python',
+    'project.requires-python', // PEP-621
     'tool.poetry.dependencies.python'
 ];
 
 const TEST_COMMAND_PATHS = [
     'tool.tasks.test',
-    'tool.poe.tasks.test'
+    'tool.pdm.scripts.test',
+    'tool.poe.tasks.test',
+    'tool.invoke.tasks.test'
 ];
 
 const PACKAGE_COMMAND_PATHS = [
     'tool.tasks.package',
-    'tool.poe.tasks.package'
+    'tool.pdm.scripts.package',
+    'tool.poe.tasks.package',
+    'tool.invoke.tasks.package'
 ];
 
 /***/ }),
@@ -645,7 +681,7 @@ class OidcClient {
                 .catch(error => {
                 throw new Error(`Failed to get ID Token. \n 
         Error Code : ${error.statusCode}\n 
-        Error Message: ${error.result.message}`);
+        Error Message: ${error.message}`);
             });
             const id_token = (_a = res.result) === null || _a === void 0 ? void 0 : _a.value;
             if (!id_token) {
@@ -15039,25 +15075,7 @@ module.exports = require("util");
 var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
-const core = __nccwpck_require__(2186);
-const findPythonProjects = __nccwpck_require__(7875)
-
-async function run() {
-  try {
-    const rootPath = core.getInput('root-path');
-    core.info(`Searching in "${rootPath}" ...`);
-
-    output = await findPythonProjects(rootPath);
-
-    core.setOutput('projects', JSON.stringify(output.projects));
-    core.setOutput('paths', JSON.stringify(output.paths));
-    core.setOutput('testable-projects', JSON.stringify(output.testableProjects));
-    core.setOutput('packageable-projects', JSON.stringify(output.packageableProjects));
-
-  } catch (error) {
-    core.setFailed(error.message);
-  }
-}
+const { run } = __nccwpck_require__(7875)
 
 run();
 
