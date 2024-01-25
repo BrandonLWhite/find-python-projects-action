@@ -111,15 +111,13 @@ const PYTHON_VERSION_PATHS = [
 const TEST_COMMAND_PATHS = [
     'tool.tasks.test',
     'tool.pdm.scripts.test',
-    'tool.poe.tasks.test',
-    'tool.invoke.tasks.test'
+    'tool.poe.tasks.test'
 ];
 
 const PACKAGE_COMMAND_PATHS = [
     'tool.tasks.package',
     'tool.pdm.scripts.package',
-    'tool.poe.tasks.package',
-    'tool.invoke.tasks.package'
+    'tool.poe.tasks.package'
 ];
 
 /***/ }),
