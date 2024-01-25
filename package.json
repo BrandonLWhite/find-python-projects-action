@@ -1,7 +1,7 @@
 {
   "name": "find-python-projects-action",
   "version": "1.0.0",
-  "description": "GitHub Action that discovers Python sub-projects in a monorepo workspace project",
+  "description": "GitHub Action for discovering Python projects in a repository and exposing helpful things from pyproject.toml to other steps.",
   "main": "index.js",
   "scripts": {
     "lint": "eslint .",

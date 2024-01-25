@@ -1,5 +1,9 @@
 name: Find Python Projects
-description: Discovers Python sub-projects in a monorepo workspace project
+description: Discover Python projects in a repository and expose helpful things from pyproject.toml to other steps
+author: brandonlwhite@gmail.com
+branding:
+  icon: search
+  color: blue
 
 inputs:
   root-dir:
