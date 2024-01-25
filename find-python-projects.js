@@ -51,7 +51,16 @@ async function findPythonProjects(rootDir) {
 
         const buildBackend = projectTomlParsed?.['build-system']?.['build-backend'];
         const usePoetry = (buildBackend || '').startsWith('poetry');
+
+        // TODO: Figure out the best way to deal with this.  The issue is that some tools, like Poetry, need a separate
+        // `poetry install` before subsequent `poetry run ...` operations can take place.
+        // Best bet is to experiment with PDM to see how it behaves (eg does it automatically do an install when
+        // necessary as part of executing a task/script)
         const installCommand = buildBackend && (usePoetry ? 'poetry install' : 'pip install');
+
+        // TODO : Need to make this more adaptive in how it resolves the final shell command.  For instance,
+        // if it is a POE command, the returned shell command should be `poe run test`.  Similarly for other
+        // task runners, including PDM (I think).
         const testCommand = get_best_config(projectTomlParsed, TEST_COMMAND_PATHS);
         const packageCommand = get_best_config(projectTomlParsed, PACKAGE_COMMAND_PATHS);
 
