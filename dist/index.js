@@ -58,9 +58,6 @@ async function findPythonProjects(rootDir) {
         const buildBackend = projectTomlParsed?.['build-system']?.['build-backend'];
         const installCommand = determine_install_command(projectTomlParsed, buildBackend)
 
-        // TODO : Need to make this more adaptive in how it resolves the final shell command.  For instance,
-        // if it is a POE command, the returned shell command should be `poe run test`.  Similarly for other
-        // task runners, including PDM (I think).
         const testCommand = get_best_command(projectTomlParsed, TEST_COMMAND_PATHS);
         const packageCommand = get_best_command(projectTomlParsed, PACKAGE_COMMAND_PATHS);
 
