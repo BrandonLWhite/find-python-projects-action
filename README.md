@@ -37,6 +37,7 @@ These are the fields for `project` objects in the output:
 - **pythonVersion**: Value of `[project.requires-python]` or `[tool.poetry.dependencies.python]` from `pyproject.toml`
 
 - **installCommand**: The shell command to run to create and install dependencies into the virtual environment.
+                      This can either be specified explicitly in `[tool.tasks.install]` or deduced from the `[build-system.build-backend]`
 
 - **testCommand**: The shell command to run to execute the tests for the project.
 

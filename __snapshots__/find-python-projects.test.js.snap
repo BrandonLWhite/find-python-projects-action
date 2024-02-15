@@ -18,6 +18,8 @@ exports[`find-python-projects finds projects 1`] = `
     "test-fixtures/multi-project/project-1/pyproject.toml",
     "test-fixtures/multi-project/project-2/pyproject.toml",
     "test-fixtures/multi-project/project-4/pyproject.toml",
+    "test-fixtures/multi-project/project-5/pyproject.toml",
+    "test-fixtures/multi-project/project-6/pyproject.toml",
   ],
   "projects": [
     {
@@ -49,6 +51,26 @@ exports[`find-python-projects finds projects 1`] = `
       "pythonVersion": "^3.9",
       "testCommand": null,
     },
+    {
+      "buildBackend": "pdm.backend",
+      "directory": "test-fixtures/multi-project/project-5",
+      "installCommand": "pdm install",
+      "name": "project-5",
+      "packageCommand": null,
+      "path": "test-fixtures/multi-project/project-5/pyproject.toml",
+      "pythonVersion": "==3.12.*",
+      "testCommand": "pdm run test",
+    },
+    {
+      "buildBackend": "poetry.core.masonry.api",
+      "directory": "test-fixtures/multi-project/project-6",
+      "installCommand": "poetry install",
+      "name": "sub-project-1",
+      "packageCommand": null,
+      "path": "test-fixtures/multi-project/project-6/pyproject.toml",
+      "pythonVersion": "^3.9",
+      "testCommand": "poe run test",
+    },
   ],
   "testable-projects": [
     {
@@ -60,6 +82,26 @@ exports[`find-python-projects finds projects 1`] = `
       "path": "test-fixtures/multi-project/project-2/pyproject.toml",
       "pythonVersion": "^3.9",
       "testCommand": "poetry run pytest",
+    },
+    {
+      "buildBackend": "pdm.backend",
+      "directory": "test-fixtures/multi-project/project-5",
+      "installCommand": "pdm install",
+      "name": "project-5",
+      "packageCommand": null,
+      "path": "test-fixtures/multi-project/project-5/pyproject.toml",
+      "pythonVersion": "==3.12.*",
+      "testCommand": "pdm run test",
+    },
+    {
+      "buildBackend": "poetry.core.masonry.api",
+      "directory": "test-fixtures/multi-project/project-6",
+      "installCommand": "poetry install",
+      "name": "sub-project-1",
+      "packageCommand": null,
+      "path": "test-fixtures/multi-project/project-6/pyproject.toml",
+      "pythonVersion": "^3.9",
+      "testCommand": "poe run test",
     },
   ],
 }

@@ -55,8 +55,8 @@ async function findPythonProjects(rootDir) {
         // TODO : Need to make this more adaptive in how it resolves the final shell command.  For instance,
         // if it is a POE command, the returned shell command should be `poe run test`.  Similarly for other
         // task runners, including PDM (I think).
-        const testCommand = get_best_config(projectTomlParsed, TEST_COMMAND_PATHS);
-        const packageCommand = get_best_config(projectTomlParsed, PACKAGE_COMMAND_PATHS);
+        const testCommand = get_best_command(projectTomlParsed, TEST_COMMAND_PATHS);
+        const packageCommand = get_best_command(projectTomlParsed, PACKAGE_COMMAND_PATHS);
 
         projects.push({
             name: projectName,
@@ -84,6 +84,24 @@ function get_best_config(configRoot, knownPaths, defaultValue = null) {
         if (value) return value;
     }
     return defaultValue;
+}
+
+function get_best_command(configRoot, knownPaths) {
+    for (const knownPath of knownPaths) {
+        const commandPath = knownPath.tomlPath
+        const value = _get(configRoot, commandPath)
+        if (value) {
+            const runnerPrefix = knownPath?.context?.runnerPrefix
+            if(runnerPrefix) {
+                const commandPathParts = commandPath.split('.')
+                const commandName = commandPathParts[commandPathParts.length - 1]
+                return [runnerPrefix, commandName].join(' ')
+            }
+            else
+                return value
+        }
+    }
+    return null;
 }
 
 function determine_install_command(projectTomlParsed, buildBackend) {
@@ -117,14 +135,17 @@ const PYTHON_VERSION_PATHS = [
     'tool.poetry.dependencies.python'
 ];
 
+const POE_RUN_PREFIX = 'poe run'
+const PDM_RUN_PREFIX = 'pdm run'
+
 const TEST_COMMAND_PATHS = [
-    'tool.tasks.test',
-    'tool.pdm.scripts.test',
-    'tool.poe.tasks.test'
+    {tomlPath: 'tool.tasks.test'},
+    {tomlPath: 'tool.pdm.scripts.test', context: {runnerPrefix: PDM_RUN_PREFIX}},
+    {tomlPath: 'tool.poe.tasks.test', context: {runnerPrefix: POE_RUN_PREFIX}}
 ];
 
 const PACKAGE_COMMAND_PATHS = [
-    'tool.tasks.package',
-    'tool.pdm.scripts.package',
-    'tool.poe.tasks.package'
+    {tomlPath: 'tool.tasks.package'},
+    {tomlPath: 'tool.pdm.scripts.package', context: {runnerPrefix: PDM_RUN_PREFIX}},
+    {tomlPath: 'tool.poe.tasks.package',  context: {runnerPrefix: POE_RUN_PREFIX}}
 ];
