@@ -5,6 +5,11 @@ exports[`find-python-projects finds projects 1`] = `
   "packageable-projects": [
     {
       "buildBackend": "poetry.core.masonry.api",
+      "commands": {
+        "install": "poetry install",
+        "package": "poetry bundle venv",
+        "test": "poetry run pytest",
+      },
       "directory": "test-fixtures/multi-project/project-2",
       "installCommand": "poetry install",
       "name": "sub-project-2",
@@ -24,16 +29,22 @@ exports[`find-python-projects finds projects 1`] = `
   "projects": [
     {
       "buildBackend": "poetry.core.masonry.api",
+      "commands": {
+        "install": "poetry install",
+      },
       "directory": "test-fixtures/multi-project/project-1",
       "installCommand": "poetry install",
       "name": "sub-project-1",
-      "packageCommand": null,
       "path": "test-fixtures/multi-project/project-1/pyproject.toml",
       "pythonVersion": "^3.9",
-      "testCommand": null,
     },
     {
       "buildBackend": "poetry.core.masonry.api",
+      "commands": {
+        "install": "poetry install",
+        "package": "poetry bundle venv",
+        "test": "poetry run pytest",
+      },
       "directory": "test-fixtures/multi-project/project-2",
       "installCommand": "poetry install",
       "name": "sub-project-2",
@@ -43,30 +54,37 @@ exports[`find-python-projects finds projects 1`] = `
       "testCommand": "poetry run pytest",
     },
     {
+      "commands": {
+        "install": null,
+      },
       "directory": "test-fixtures/multi-project/project-4",
       "installCommand": null,
       "name": "sub-project-4",
-      "packageCommand": null,
       "path": "test-fixtures/multi-project/project-4/pyproject.toml",
       "pythonVersion": "^3.9",
-      "testCommand": null,
     },
     {
       "buildBackend": "pdm.backend",
+      "commands": {
+        "install": "pdm install",
+        "test": "pdm run test",
+      },
       "directory": "test-fixtures/multi-project/project-5",
       "installCommand": "pdm install",
       "name": "project-5",
-      "packageCommand": null,
       "path": "test-fixtures/multi-project/project-5/pyproject.toml",
       "pythonVersion": "==3.12.*",
       "testCommand": "pdm run test",
     },
     {
       "buildBackend": "poetry.core.masonry.api",
+      "commands": {
+        "install": "poetry install",
+        "test": "poe run test",
+      },
       "directory": "test-fixtures/multi-project/project-6",
       "installCommand": "poetry install",
       "name": "sub-project-1",
-      "packageCommand": null,
       "path": "test-fixtures/multi-project/project-6/pyproject.toml",
       "pythonVersion": "^3.9",
       "testCommand": "poe run test",
@@ -75,6 +93,11 @@ exports[`find-python-projects finds projects 1`] = `
   "testable-projects": [
     {
       "buildBackend": "poetry.core.masonry.api",
+      "commands": {
+        "install": "poetry install",
+        "package": "poetry bundle venv",
+        "test": "poetry run pytest",
+      },
       "directory": "test-fixtures/multi-project/project-2",
       "installCommand": "poetry install",
       "name": "sub-project-2",
@@ -85,20 +108,26 @@ exports[`find-python-projects finds projects 1`] = `
     },
     {
       "buildBackend": "pdm.backend",
+      "commands": {
+        "install": "pdm install",
+        "test": "pdm run test",
+      },
       "directory": "test-fixtures/multi-project/project-5",
       "installCommand": "pdm install",
       "name": "project-5",
-      "packageCommand": null,
       "path": "test-fixtures/multi-project/project-5/pyproject.toml",
       "pythonVersion": "==3.12.*",
       "testCommand": "pdm run test",
     },
     {
       "buildBackend": "poetry.core.masonry.api",
+      "commands": {
+        "install": "poetry install",
+        "test": "poe run test",
+      },
       "directory": "test-fixtures/multi-project/project-6",
       "installCommand": "poetry install",
       "name": "sub-project-1",
-      "packageCommand": null,
       "path": "test-fixtures/multi-project/project-6/pyproject.toml",
       "pythonVersion": "^3.9",
       "testCommand": "poe run test",
