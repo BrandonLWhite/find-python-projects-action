@@ -20,15 +20,14 @@ async function run() {
       const output = await findPythonProjects(rootDir);
 
       core.setOutput('projects', JSON.stringify(output.projects));
+      core.setOutput('projects-by-command', JSON.stringify(output.projectsByCommand));
       core.setOutput('paths', JSON.stringify(output.paths));
       core.setOutput('testable-projects', JSON.stringify(output.testableProjects));
       core.setOutput('packageable-projects', JSON.stringify(output.packageableProjects));
-      // TODO: projects-by-command
-
     } catch (error) {
       core.setFailed(error.message);
     }
-  }
+}
 
 async function findPythonProjects(rootDir) {
     const globbyOpts = {
@@ -39,39 +38,63 @@ async function findPythonProjects(rootDir) {
     }
 
     const candidatePaths = await globby("**/pyproject.toml", globbyOpts);
+    candidatePaths.sort();
 
     const projects = [];
 
     for await (const candidatePath of candidatePaths) {
         const pyprojectPath = path.join(rootDir, candidatePath);
-        const projectToml = await fs.readFile(pyprojectPath);
-        const projectTomlParsed = TOML.parse(projectToml);
-
-        const projectName = getBestConfig(projectTomlParsed, PROJECT_NAME_PATHS);
-        const pythonVersion = getBestConfig(projectTomlParsed, PYTHON_VERSION_PATHS);
-
-        const commands = generateCommands(projectTomlParsed);
-
-        projects.push({
-            name: projectName,
-            path: pyprojectPath,
-            directory: path.dirname(pyprojectPath),
-            buildBackend: getBuildBackend(projectTomlParsed),
-            pythonVersion: pythonVersion,
-            installCommand: commands.install, // TODO: Remove
-            testCommand: commands.test, // TODO: Remove
-            packageCommand: commands.package, // TODO: Remove
-            commands: commands
-        });
+        const project = await createProjectResult(pyprojectPath);
+        projects.push(project);
     }
 
     return {
         projects: projects,
         paths: projects.map(project => project.path),
+        projectsByCommand: getProjectsByCommand(projects),
         testableProjects: projects.filter(project => project.testCommand),
         packageableProjects: projects.filter(project => project.packageCommand)
-        // TODO: projectsByCommand
     }
+}
+
+async function createProjectResult(pyprojectPath) {
+    const projectToml = await fs.readFile(pyprojectPath);
+    const projectTomlParsed = TOML.parse(projectToml);
+
+    const projectName = getBestConfig(projectTomlParsed, PROJECT_NAME_PATHS);
+    const pythonVersion = getBestConfig(projectTomlParsed, PYTHON_VERSION_PATHS);
+
+    const commands = generateCommands(projectTomlParsed);
+
+    return {
+        name: projectName,
+        path: pyprojectPath,
+        directory: path.dirname(pyprojectPath),
+        buildBackend: getBuildBackend(projectTomlParsed),
+        pythonVersion: pythonVersion,
+        installCommand: commands.install, // TODO: Remove
+        testCommand: commands.test, // TODO: Remove
+        packageCommand: commands.package, // TODO: Remove
+        commands: commands
+    };
+}
+
+function getProjectsByCommand(projects) {
+    const commands = {}
+
+    for(const project of projects) {
+        for(const [commandName, commandValue] of Object.entries(project.commands)) {
+            if (!commandValue) continue;
+
+            let commandEntry = commands[commandName];
+            if (!commandEntry) {
+                commandEntry = commands[commandName] = [];
+            }
+            commandEntry.push(project);
+        }
+    }
+
+    return commands;
 }
 
 function getBestConfig(configRoot, knownPaths, defaultValue = null) {

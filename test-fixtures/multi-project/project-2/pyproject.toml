@@ -19,3 +19,4 @@ build-backend = "poetry.core.masonry.api"
 [tool.tasks]
 test = "poetry run pytest"
 package = "poetry bundle venv"
+something-arbitrary = "echo 'Example of arbitrary shell command'"
