@@ -22,8 +22,6 @@ async function run() {
       core.setOutput('projects', JSON.stringify(output.projects));
       core.setOutput('projects-by-command', JSON.stringify(output.projectsByCommand));
       core.setOutput('paths', JSON.stringify(output.paths));
-      core.setOutput('testable-projects', JSON.stringify(output.testableProjects));
-      core.setOutput('packageable-projects', JSON.stringify(output.packageableProjects));
     } catch (error) {
       core.setFailed(error.message);
     }
@@ -72,9 +70,6 @@ async function createProjectResult(pyprojectPath) {
         directory: path.dirname(pyprojectPath),
         buildBackend: getBuildBackend(projectTomlParsed),
         pythonVersion: pythonVersion,
-        installCommand: commands.install, // TODO: Remove
-        testCommand: commands.test, // TODO: Remove
-        packageCommand: commands.package, // TODO: Remove
         commands: commands
     };
 }
