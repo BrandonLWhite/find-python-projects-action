@@ -11,7 +11,7 @@ jobs:
 
       - name: Discover Projects
         id: discover
-        uses: BrandonLWhite/find-python-projects-action@main
+        uses: BrandonLWhite/find-python-projects-action@vX.Y.Z
 
       - name: Print Paths
         run: echo ${{steps.discover.outputs.paths }}

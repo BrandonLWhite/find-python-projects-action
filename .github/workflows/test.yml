@@ -21,5 +21,45 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: ./
+      id: discover
       with:
         root-dir: ./test-fixtures/multi-project
+    outputs:
+      projects-by-command: ${{ steps.discover.outputs.projects-by-command }}
+
+  build-python-projects:
+    name: "Test: ${{ matrix.project.name }}"
+    runs-on: ubuntu-latest
+    needs: test
+    strategy:
+      matrix:
+        project: ${{ fromJson(needs.test.outputs.projects-by-command.install) }}
+
+    defaults:
+      run:
+        shell: bash
+        working-directory: ${{ matrix.project.directory }}
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Dump project object
+        run: |
+          echo '${{ toJson(matrix.project) }}'
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: ${{ matrix.project.path }}
+
+      - name: Install project
+        if: matrix.project.commands.install
+        run: ${{ matrix.project.commands.install }}
+
+      - name: Test project
+        run: ${{ matrix.project.commands.test }}
+
+      - name: Package project
+        if: matrix.project.commands.package
+        run: ${{ matrix.project.commands.package }}
