@@ -47,12 +47,12 @@ jobs:
           python-version-file: ${{ matrix.project.path }}
 
       - name: Install project
-        if: matrix.project.installCommand
-        run: ${{ matrix.project.installCommand }}
+        if: matrix.project.commands.install
+        run: ${{ matrix.project.commands.install }}
 
       - name: Test project
-        run: ${{ matrix.project.testCommand }}
+        run: ${{ matrix.project.commands.test }}
 
       - name: Package project
-        if: matrix.project.packageCommand
-        run: ${{ matrix.project.packageCommand }}
+        if: matrix.project.commands.package
+        run: ${{ matrix.project.commands.package }}

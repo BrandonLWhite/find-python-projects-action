@@ -26,14 +26,12 @@ async function run() {
       const output = await findPythonProjects(rootDir);
 
       core.setOutput('projects', JSON.stringify(output.projects));
+      core.setOutput('projects-by-command', JSON.stringify(output.projectsByCommand));
       core.setOutput('paths', JSON.stringify(output.paths));
-      core.setOutput('testable-projects', JSON.stringify(output.testableProjects));
-      core.setOutput('packageable-projects', JSON.stringify(output.packageableProjects));
-
     } catch (error) {
       core.setFailed(error.message);
     }
-  }
+}
 
 async function findPythonProjects(rootDir) {
     const globbyOpts = {
@@ -44,48 +42,60 @@ async function findPythonProjects(rootDir) {
     }
 
     const candidatePaths = await globby("**/pyproject.toml", globbyOpts);
+    candidatePaths.sort();
 
     const projects = [];
 
     for await (const candidatePath of candidatePaths) {
         const pyprojectPath = path.join(rootDir, candidatePath);
-        const projectToml = await fs.readFile(pyprojectPath);
-        const projectTomlParsed = TOML.parse(projectToml);
-
-        const projectName = getBestConfig(projectTomlParsed, PROJECT_NAME_PATHS);
-        const pythonVersion = getBestConfig(projectTomlParsed, PYTHON_VERSION_PATHS);
-
-        // New idea: Instead of having hard-coded known commands, instead dynamically enumerate
-        // and then expose them via projectsByCommand, like:
-        // How to selectively indicate a publishable library?  This is my main motivation, how
-        // to hook up a lib publish selectively?  How to differentiate between a lambda (don't publish)
-        // and a library (publish)? Decision: Explicitly set `publish` command.  No default/implicit.
-        // projectsByCommand.test[].
-        // The `install` command can be added dynamically if not explicitly set by the project.
-        // Strategy: For each know task/command source (eg tool.tasks, poe.tasks, pdm scripts)
-        // const testCommand = getBestCommand(projectTomlParsed, TEST_COMMAND_PATHS);
-        // const packageCommand = getBestCommand(projectTomlParsed, PACKAGE_COMMAND_PATHS);
-        const commands = generateCommands(projectTomlParsed);
-
-        projects.push({
-            name: projectName,
-            path: pyprojectPath,
-            directory: path.dirname(pyprojectPath),
-            buildBackend: getBuildBackend(projectTomlParsed),
-            pythonVersion: pythonVersion,
-            installCommand: commands.install,
-            testCommand: commands.test,
-            packageCommand: commands.package,
-            commands: commands
-        });
+        const project = await createProjectResult(pyprojectPath);
+        projects.push(project);
     }
 
     return {
         projects: projects,
         paths: projects.map(project => project.path),
+        projectsByCommand: getProjectsByCommand(projects),
         testableProjects: projects.filter(project => project.testCommand),
         packageableProjects: projects.filter(project => project.packageCommand)
     }
+}
+
+async function createProjectResult(pyprojectPath) {
+    const projectToml = await fs.readFile(pyprojectPath);
+    const projectTomlParsed = TOML.parse(projectToml);
+
+    const projectName = getBestConfig(projectTomlParsed, PROJECT_NAME_PATHS);
+    const pythonVersion = getBestConfig(projectTomlParsed, PYTHON_VERSION_PATHS);
+
+    const commands = generateCommands(projectTomlParsed);
+
+    return {
+        name: projectName,
+        path: pyprojectPath,
+        directory: path.dirname(pyprojectPath),
+        buildBackend: getBuildBackend(projectTomlParsed),
+        pythonVersion: pythonVersion,
+        commands: commands
+    };
+}
+
+function getProjectsByCommand(projects) {
+    const commands = {}
+
+    for(const project of projects) {
+        for(const [commandName, commandValue] of Object.entries(project.commands)) {
+            if (!commandValue) continue;
+
+            let commandEntry = commands[commandName];
+            if (!commandEntry) {
+                commandEntry = commands[commandName] = [];
+            }
+            commandEntry.push(project);
+        }
+    }
+
+    return commands;
 }
 
 function getBestConfig(configRoot, knownPaths, defaultValue = null) {
@@ -96,24 +106,6 @@ function getBestConfig(configRoot, knownPaths, defaultValue = null) {
     return defaultValue;
 }
 
-// function getBestCommand(configRoot, knownPaths) {
-//     for (const knownPath of knownPaths) {
-//         const commandPath = knownPath.tomlPath
-//         const value = _get(configRoot, commandPath)
-//         if (value) {
-//             const runnerPrefix = knownPath?.context?.runnerPrefix
-//             if(runnerPrefix) {
-//                 const commandPathParts = commandPath.split('.')
-//                 const commandName = commandPathParts[commandPathParts.length - 1]
-//                 return [runnerPrefix, commandName].join(' ')
-//             }
-//             else
-//                 return value
-//         }
-//     }
-//     return null;
-// }
-
 function getBuildBackend(projectTomlParsed) {
     return projectTomlParsed?.['build-system']?.['build-backend'];
 }
@@ -121,20 +113,15 @@ function getBuildBackend(projectTomlParsed) {
 function generateCommands(projectTomlParsed) {
     const commands = {}
 
-    // TODO : Move this out to a CONST
-    const knownCommandSources = [
-        {tomlPath: 'tool.tasks', context: {}},
-        {tomlPath: 'tool.pdm.scripts', context: {runnerPrefix: PDM_RUN_PREFIX}},
-        {tomlPath: 'tool.poe.tasks', context: {runnerPrefix: POE_RUN_PREFIX}}
-    ]
-
-    for(const source of knownCommandSources) {
+    for(const source of KNOWN_COMMAND_SOURCES) {
         const sourceCommands = _get(projectTomlParsed, source.tomlPath)
+        if (!sourceCommands) continue;
+
         for(const [commandName, commandTomlValue] of Object.entries(sourceCommands)) {
             // Skip if the command has already been set.
             if (commands[commandName]) continue;
 
-            runnerPrefix = source.context.runnerPrefix
+            const runnerPrefix = source.context.runnerPrefix
             if(runnerPrefix) {
                 commands[commandName] = runnerPrefix + ' ' + commandName;
             }
@@ -145,22 +132,13 @@ function generateCommands(projectTomlParsed) {
     }
 
     if (!commands.install) {
-        commands.install = determine_install_command(projectTomlParsed);
+        commands.install = determineInstallCommand(projectTomlParsed);
     }
 
     return commands;
 }
 
-function determine_install_command(projectTomlParsed) {
-    // First check explicit task command
-    // TODO: This part can go away since it will be handled by generateCommands
-    // const explicitInstallCommand = getBestConfig(projectTomlParsed, [
-    //     'tool.tasks.install'
-    // ])
-    // if (explicitInstallCommand) return explicitInstallCommand
-
-    // Otherwise deduce from the build backend.
-
+function determineInstallCommand(projectTomlParsed) {
     const buildBackend = getBuildBackend(projectTomlParsed);
 
     if (!buildBackend) return null;
@@ -188,17 +166,12 @@ const PYTHON_VERSION_PATHS = [
 const POE_RUN_PREFIX = 'poe run'
 const PDM_RUN_PREFIX = 'pdm run'
 
-// const TEST_COMMAND_PATHS = [
-//     {tomlPath: 'tool.tasks.test'},
-//     {tomlPath: 'tool.pdm.scripts.test', context: {runnerPrefix: PDM_RUN_PREFIX}},
-//     {tomlPath: 'tool.poe.tasks.test', context: {runnerPrefix: POE_RUN_PREFIX}}
-// ];
+const KNOWN_COMMAND_SOURCES = [
+    {tomlPath: 'tool.tasks', context: {}},
+    {tomlPath: 'tool.pdm.scripts', context: {runnerPrefix: PDM_RUN_PREFIX}},
+    {tomlPath: 'tool.poe.tasks', context: {runnerPrefix: POE_RUN_PREFIX}}
+]
 
-// const PACKAGE_COMMAND_PATHS = [
-//     {tomlPath: 'tool.tasks.package'},
-//     {tomlPath: 'tool.pdm.scripts.package', context: {runnerPrefix: PDM_RUN_PREFIX}},
-//     {tomlPath: 'tool.poe.tasks.package',  context: {runnerPrefix: POE_RUN_PREFIX}}
-// ];
 
 /***/ }),
 

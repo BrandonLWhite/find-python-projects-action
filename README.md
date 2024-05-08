@@ -18,9 +18,9 @@ Python projects contained in this directory or lower will be discovered.  Defaul
 
 - **projects**: JSON array of all found projects ([project object](#project-object-output-shape))
 
-- **testable-projects**: JSON array of all found projects ([project object](#project-object-output-shape)) that implement a `test` command in `pyproject.toml` (See [Project Commands](#project-commands))
-
-- **packageable-projects**: JSON array of all found projects ([project object](#project-object-output-shape)) that implement a `package` command in `pyproject.toml` (See [Project Commands](#project-commands))
+- **projects-by-command**: JSON object with keys corresponding to the name of discovered commands
+(eg `install`, `test`, `package`, etc.) in all projects, with an array value containing each
+([project object](#project-object-output-shape)) that implements the command.
 
 
 ## Project object output shape
@@ -36,21 +36,19 @@ These are the fields for `project` objects in the output:
 
 - **pythonVersion**: Value of `[project.requires-python]` or `[tool.poetry.dependencies.python]` from `pyproject.toml`
 
-- **installCommand**: The shell command to run to create and install dependencies into the virtual environment.
-                      This can either be specified explicitly in `[tool.tasks.install]` or deduced from the `[build-system.build-backend]`
-
-- **testCommand**: The shell command to run to execute the tests for the project.
-
-- **packageCommand**: The shell command to run to execute packaging operations for the project.
+- **commands**: Object with keys for each discovered command and the shell command as the value.
+This is dynamically constructed from the pyproject.toml content.
 
 
 ## Project Commands
 In the absence of Python standards for expressing internal project CI/CD/Dev operations, this action tries to unify the various known ways in the wild.
 
-This action recognizes the following typical CI related shell commands:
+This action will surface any command you specify in the pyproject.toml files.  Typically you'll
+want to define one or more of the following for your CI/CD system::
 
 - `test`
 - `package`
+- `publish`
 
 In order to make these commands available in the action output, you'll need to define them in `pyproject.toml` using a section appropriate for the particular tools you are using in the project.  You can specify all, some, or none, depending on what you need available.
 
@@ -59,6 +57,9 @@ This action will pull the command from the first entry it finds in any of the fo
 - `[tool.pdm.scripts]`: [PDM](https://pdm-project.org/latest/usage/scripts/)
 - `[tool.poe.tasks]`: [poethepoet](https://github.com/nat-n/poethepoet)
 
+### The `install` command
+This action perfoms special treatment for surfacing the `install` command.  Namely, if it is not explicitly specified, the action will attempt to generate a default based on the packaging backend (eg Poetry, PDM) that it discovers.
+The intent is that you do not need to specify an `install` command in your pyproject.toml, but you can if necessary.
 
 ### Where is the support for `[tool.poetry.scripts]`?
 Unfortunately, [Poetry scripts](https://python-poetry.org/docs/pyproject/#scripts) is for specifying commands that are made available to consumers of a package.  It isn't meant for CI/CD or developer operations and doesn't meet those needs, primarily because any scripts you define in this section will be added as executable shortcuts to your virtual environment or any virtual environment your package is installed into.

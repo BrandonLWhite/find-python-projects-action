@@ -115,7 +115,7 @@ function generateCommands(projectTomlParsed) {
             // Skip if the command has already been set.
             if (commands[commandName]) continue;
 
-            runnerPrefix = source.context.runnerPrefix
+            const runnerPrefix = source.context.runnerPrefix
             if(runnerPrefix) {
                 commands[commandName] = runnerPrefix + ' ' + commandName;
             }
