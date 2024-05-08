@@ -53,6 +53,9 @@ jobs:
         with:
           python-version-file: ${{ matrix.project.path }}
 
+      - run: pipx install poetry
+      - run: pipx install pdm
+
       - name: Install project
         if: matrix.project.commands.install
         run: ${{ matrix.project.commands.install }}
