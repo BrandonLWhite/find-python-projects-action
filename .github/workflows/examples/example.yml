@@ -11,14 +11,13 @@ jobs:
 
       - name: Discover Projects
         id: discover
-        uses: BrandonLWhite/find-python-projects-action@main
+        uses: BrandonLWhite/find-python-projects-action@vX.Y.Z
 
       - name: Print Paths
         run: echo ${{steps.discover.outputs.paths }}
 
     outputs:
-      testable-projects: ${{ steps.discover.outputs.testable-projects }}
-      packageable-projects: ${{ steps.discover.outputs.packageable-projects }}
+      projects-by-command: ${{ steps.discover.outputs.projects-by-command }}
 
   build-python-projects:
     name: "Test: ${{ matrix.project.name }}"
@@ -26,7 +25,7 @@ jobs:
     needs: discover-python-projects
     strategy:
       matrix:
-        project: ${{ fromJson(needs.discover-python-projects.outputs.testable-projects) }}
+        project: ${{ fromJson(needs.discover-python-projects.outputs.projects-by-command.install) }}
 
     defaults:
       run:
@@ -47,12 +46,12 @@ jobs:
           python-version-file: ${{ matrix.project.path }}
 
       - name: Install project
-        if: matrix.project.installCommand
-        run: ${{ matrix.project.installCommand }}
+        if: matrix.project.commands.install
+        run: ${{ matrix.project.commands.install }}
 
       - name: Test project
-        run: ${{ matrix.project.testCommand }}
+        run: ${{ matrix.project.commands.test }}
 
       - name: Package project
-        if: matrix.project.packageCommand
-        run: ${{ matrix.project.packageCommand }}
+        if: matrix.project.commands.package
+        run: ${{ matrix.project.commands.package }}

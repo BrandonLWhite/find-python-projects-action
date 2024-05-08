@@ -65,3 +65,8 @@ typings/
 
 # next.js build output
 .next
+
+__pycache__/
+*.py[cod]
+*$py.class
+.venv
