@@ -20,7 +20,7 @@ Python projects contained in this directory or lower will be discovered.  Defaul
 
 - **projects-by-command**: JSON object with keys corresponding to the name of discovered commands
 (eg `install`, `test`, `package`, etc.) in all projects, with an array value containing each
-([project object](#project-object-output-shape)) that implements the command.
+[project object](#project-object-output-shape) that implements the command.
 
 
 ## Project object output shape
@@ -37,7 +37,7 @@ These are the fields for `project` objects in the output:
 - **pythonVersion**: Value of `[project.requires-python]` or `[tool.poetry.dependencies.python]` from `pyproject.toml`
 
 - **commands**: Object with keys for each discovered command and the shell command as the value.
-This is dynamically constructed from the pyproject.toml content.
+This is dynamically constructed from the `pyproject.toml` content.
 
 
 ## Project Commands
