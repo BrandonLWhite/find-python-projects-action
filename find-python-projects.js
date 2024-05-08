@@ -157,7 +157,7 @@ const PYTHON_VERSION_PATHS = [
     'tool.poetry.dependencies.python'
 ];
 
-const POE_RUN_PREFIX = 'poe run'
+const POE_RUN_PREFIX = 'poe'
 const PDM_RUN_PREFIX = 'pdm run'
 
 const KNOWN_COMMAND_SOURCES = [
