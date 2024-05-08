@@ -55,6 +55,7 @@ jobs:
 
       - run: pipx install poetry
       - run: pipx install pdm
+      - run: pipx install poe
 
       - name: Install project
         if: matrix.project.commands.install
