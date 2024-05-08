@@ -17,8 +17,7 @@ jobs:
         run: echo ${{steps.discover.outputs.paths }}
 
     outputs:
-      testable-projects: ${{ steps.discover.outputs.testable-projects }}
-      packageable-projects: ${{ steps.discover.outputs.packageable-projects }}
+      projects-by-command: ${{ steps.discover.outputs.projects-by-command }}
 
   build-python-projects:
     name: "Test: ${{ matrix.project.name }}"
@@ -26,7 +25,7 @@ jobs:
     needs: discover-python-projects
     strategy:
       matrix:
-        project: ${{ fromJson(needs.discover-python-projects.outputs.testable-projects) }}
+        project: ${{ fromJson(needs.discover-python-projects.outputs.projects-by-command.install) }}
 
     defaults:
       run:
