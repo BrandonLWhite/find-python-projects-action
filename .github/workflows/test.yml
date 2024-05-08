@@ -33,7 +33,7 @@ jobs:
     needs: test
     strategy:
       matrix:
-        project: ${{ fromJson(needs.test.outputs.projects-by-command.install) }}
+        project: ${{ fromJson(needs.test.outputs.projects-by-command).install }}
 
     defaults:
       run:
