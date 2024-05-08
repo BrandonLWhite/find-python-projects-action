@@ -24,7 +24,7 @@ exports[`find-python-projects finds projects 1`] = `
       "buildBackend": "poetry.core.masonry.api",
       "commands": {
         "install": "poetry install",
-        "package": "poetry bundle venv",
+        "package": "poetry bundle venv .package/",
         "something-arbitrary": "echo 'Example of arbitrary shell command'",
         "test": "poetry run pytest",
       },
@@ -81,7 +81,7 @@ exports[`find-python-projects finds projects 1`] = `
         "buildBackend": "poetry.core.masonry.api",
         "commands": {
           "install": "poetry install",
-          "package": "poetry bundle venv",
+          "package": "poetry bundle venv .package/",
           "something-arbitrary": "echo 'Example of arbitrary shell command'",
           "test": "poetry run pytest",
         },
@@ -118,7 +118,7 @@ exports[`find-python-projects finds projects 1`] = `
         "buildBackend": "poetry.core.masonry.api",
         "commands": {
           "install": "poetry install",
-          "package": "poetry bundle venv",
+          "package": "poetry bundle venv .package/",
           "something-arbitrary": "echo 'Example of arbitrary shell command'",
           "test": "poetry run pytest",
         },
@@ -133,7 +133,7 @@ exports[`find-python-projects finds projects 1`] = `
         "buildBackend": "poetry.core.masonry.api",
         "commands": {
           "install": "poetry install",
-          "package": "poetry bundle venv",
+          "package": "poetry bundle venv .package/",
           "something-arbitrary": "echo 'Example of arbitrary shell command'",
           "test": "poetry run pytest",
         },
@@ -148,7 +148,7 @@ exports[`find-python-projects finds projects 1`] = `
         "buildBackend": "poetry.core.masonry.api",
         "commands": {
           "install": "poetry install",
-          "package": "poetry bundle venv",
+          "package": "poetry bundle venv .package/",
           "something-arbitrary": "echo 'Example of arbitrary shell command'",
           "test": "poetry run pytest",
         },
