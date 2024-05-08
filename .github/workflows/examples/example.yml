@@ -25,7 +25,7 @@ jobs:
     needs: discover-python-projects
     strategy:
       matrix:
-        project: ${{ fromJson(needs.discover-python-projects.outputs.projects-by-command.install) }}
+        project: ${{ fromJson(needs.discover-python-projects.outputs.projects-by-command).install }}
 
     defaults:
       run:
