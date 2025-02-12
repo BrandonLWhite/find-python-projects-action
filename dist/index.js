@@ -6,8 +6,8 @@ require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 
 const core = __nccwpck_require__(2186);
 
-const fs = __nccwpck_require__(3292);
-const path = __nccwpck_require__(1017);
+const fs = __nccwpck_require__(3977);
+const path = __nccwpck_require__(9411);
 
 const globby = __nccwpck_require__(3398);
 const TOML = __nccwpck_require__(2901);
@@ -70,15 +70,19 @@ async function createProjectResult(pyprojectPath) {
 
     const commands = generateCommands(projectTomlParsed);
 
+    const upside = _get(projectTomlParsed, "tool.upside");
+
     return {
         name: projectName,
         path: pyprojectPath,
         directory: path.dirname(pyprojectPath),
         buildBackend: getBuildBackend(projectTomlParsed),
         pythonVersion: pythonVersion,
-        commands: commands
+        commands: commands,
+        upside: upside,
     };
 }
+
 
 function getProjectsByCommand(projects) {
     const commands = {}
@@ -15013,14 +15017,6 @@ module.exports = require("fs");
 
 /***/ }),
 
-/***/ 3292:
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("fs/promises");
-
-/***/ }),
-
 /***/ 3685:
 /***/ ((module) => {
 
@@ -15042,6 +15038,22 @@ module.exports = require("https");
 
 "use strict";
 module.exports = require("net");
+
+/***/ }),
+
+/***/ 3977:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("node:fs/promises");
+
+/***/ }),
+
+/***/ 9411:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("node:path");
 
 /***/ }),
 

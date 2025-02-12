@@ -20,3 +20,6 @@ build-backend = "poetry.core.masonry.api"
 test = "poetry run pytest"
 package = "poetry bundle venv .package/"
 something-arbitrary = "echo 'Example of arbitrary shell command'"
+
+[tool.upside.deployment]
+platform = "lambda"

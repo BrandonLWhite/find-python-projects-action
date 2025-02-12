@@ -1,7 +1,7 @@
 const core = require('@actions/core')
-const mapValues = require('lodash/mapValues')
+const mapValues = require('lodash/mapValues.js')
 
-const { run } = require('./find-python-projects');
+const { run } = require('./find-python-projects.js');
 
 describe('find-python-projects', () => {
 

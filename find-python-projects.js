@@ -1,11 +1,11 @@
 const core = require('@actions/core');
 
-const fs = require('fs/promises');
-const path = require('path');
+const fs = require('node:fs/promises');
+const path = require('node:path');
 
 const globby = require('globby');
 const TOML = require('@iarna/toml');
-const _get = require('lodash/get');
+const _get = require('lodash/get.js');
 
 module.exports = {
     run,
@@ -64,15 +64,19 @@ async function createProjectResult(pyprojectPath) {
 
     const commands = generateCommands(projectTomlParsed);
 
+    const upside = _get(projectTomlParsed, "tool.upside");
+
     return {
         name: projectName,
         path: pyprojectPath,
         directory: path.dirname(pyprojectPath),
         buildBackend: getBuildBackend(projectTomlParsed),
         pythonVersion: pythonVersion,
-        commands: commands
+        commands: commands,
+        upside: upside,
     };
 }
+
 
 function getProjectsByCommand(projects) {
     const commands = {}

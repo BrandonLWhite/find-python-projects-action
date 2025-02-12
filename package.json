@@ -35,7 +35,6 @@
     "eslint": "^8.56.0",
     "jest": "^29.5.0"
   },
-
   "jest": {
     "coverageReporters": [
       "json-summary",

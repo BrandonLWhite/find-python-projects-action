@@ -19,6 +19,11 @@ exports[`find-python-projects finds projects 1`] = `
       "name": "sub-project-1",
       "path": "test-fixtures/multi-project/project-1/pyproject.toml",
       "pythonVersion": "^3.9",
+      "upside": {
+        "deployment": {
+          "platform": "ecs",
+        },
+      },
     },
     {
       "buildBackend": "poetry.core.masonry.api",
@@ -32,6 +37,11 @@ exports[`find-python-projects finds projects 1`] = `
       "name": "sub-project-2",
       "path": "test-fixtures/multi-project/project-2/pyproject.toml",
       "pythonVersion": "^3.9",
+      "upside": {
+        "deployment": {
+          "platform": "lambda",
+        },
+      },
     },
     {
       "commands": {
@@ -76,6 +86,11 @@ exports[`find-python-projects finds projects 1`] = `
         "name": "sub-project-1",
         "path": "test-fixtures/multi-project/project-1/pyproject.toml",
         "pythonVersion": "^3.9",
+        "upside": {
+          "deployment": {
+            "platform": "ecs",
+          },
+        },
       },
       {
         "buildBackend": "poetry.core.masonry.api",
@@ -89,6 +104,11 @@ exports[`find-python-projects finds projects 1`] = `
         "name": "sub-project-2",
         "path": "test-fixtures/multi-project/project-2/pyproject.toml",
         "pythonVersion": "^3.9",
+        "upside": {
+          "deployment": {
+            "platform": "lambda",
+          },
+        },
       },
       {
         "buildBackend": "pdm.backend",
@@ -126,6 +146,11 @@ exports[`find-python-projects finds projects 1`] = `
         "name": "sub-project-2",
         "path": "test-fixtures/multi-project/project-2/pyproject.toml",
         "pythonVersion": "^3.9",
+        "upside": {
+          "deployment": {
+            "platform": "lambda",
+          },
+        },
       },
     ],
     "something-arbitrary": [
@@ -141,6 +166,11 @@ exports[`find-python-projects finds projects 1`] = `
         "name": "sub-project-2",
         "path": "test-fixtures/multi-project/project-2/pyproject.toml",
         "pythonVersion": "^3.9",
+        "upside": {
+          "deployment": {
+            "platform": "lambda",
+          },
+        },
       },
     ],
     "test": [
@@ -156,6 +186,11 @@ exports[`find-python-projects finds projects 1`] = `
         "name": "sub-project-2",
         "path": "test-fixtures/multi-project/project-2/pyproject.toml",
         "pythonVersion": "^3.9",
+        "upside": {
+          "deployment": {
+            "platform": "lambda",
+          },
+        },
       },
       {
         "buildBackend": "pdm.backend",
