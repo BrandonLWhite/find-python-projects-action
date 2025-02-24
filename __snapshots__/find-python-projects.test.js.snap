@@ -1,5 +1,49 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`find-python-projects Exports keys as instructed 1`] = `
+{
+  "paths": [
+    "test-fixtures/project-with-exports/pyproject.toml",
+  ],
+  "projects": [
+    {
+      "buildBackend": "poetry.core.masonry.api",
+      "commands": {
+        "install": "poetry install",
+      },
+      "directory": "test-fixtures/project-with-exports",
+      "name": "single-project",
+      "path": "test-fixtures/project-with-exports/pyproject.toml",
+      "pythonVersion": "^3.9",
+      "tool.export.me.please": {
+        "foo": "bar",
+        "one": 1,
+        "true": true,
+      },
+    },
+  ],
+  "projects-by-command": {
+    "install": [
+      {
+        "buildBackend": "poetry.core.masonry.api",
+        "commands": {
+          "install": "poetry install",
+        },
+        "directory": "test-fixtures/project-with-exports",
+        "name": "single-project",
+        "path": "test-fixtures/project-with-exports/pyproject.toml",
+        "pythonVersion": "^3.9",
+        "tool.export.me.please": {
+          "foo": "bar",
+          "one": 1,
+          "true": true,
+        },
+      },
+    ],
+  },
+}
+`;
+
 exports[`find-python-projects finds projects 1`] = `
 {
   "paths": [
