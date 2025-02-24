@@ -1,11 +1,11 @@
 const core = require('@actions/core');
 
-const fs = require('fs/promises');
-const path = require('path');
+const fs = require('node:fs/promises');
+const path = require('node:path');
 
 const globby = require('globby');
 const TOML = require('@iarna/toml');
-const _get = require('lodash/get');
+const _get = require('lodash/get.js');
 
 module.exports = {
     run,
