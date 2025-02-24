@@ -10,6 +10,11 @@ inputs:
     description: Directory root for where to begin recursively searching for projects.  Python projects contained in this directory or lower will be discovered.
     required: false
     default: '.'
+  desired-export-path:
+    description: What TOML key to export.
+    required: false
+    default: '.'
+
 
 outputs:
   paths:

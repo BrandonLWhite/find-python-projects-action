@@ -11,6 +11,7 @@ module.exports = {
     run,
     findPythonProjects
 }
+const desiredExportPath = core.getInput('desired-export-path');
 
 async function run() {
     try {
@@ -42,7 +43,7 @@ async function findPythonProjects(rootDir) {
 
     for await (const candidatePath of candidatePaths) {
         const pyprojectPath = path.join(rootDir, candidatePath);
-        const project = await createProjectResult(pyprojectPath);
+        const project = await createProjectResult(pyprojectPath, desiredExportPath);
         projects.push(project);
     }
 
@@ -55,22 +56,37 @@ async function findPythonProjects(rootDir) {
     }
 }
 
-async function createProjectResult(pyprojectPath) {
+/**
+ * @param {string} pyprojectPath
+ * @param {string[]?} desiredExportPaths
+ */
+async function createProjectResult(pyprojectPath, desiredExportPaths) {
     const projectToml = await fs.readFile(pyprojectPath);
     const projectTomlParsed = TOML.parse(projectToml);
 
     const projectName = getBestConfig(projectTomlParsed, PROJECT_NAME_PATHS);
-    const pythonVersion = getBestConfig(projectTomlParsed, PYTHON_VERSION_PATHS);
+    const pythonVersion = getBestConfig(
+        projectTomlParsed,
+        PYTHON_VERSION_PATHS,
+    );
 
     const commands = generateCommands(projectTomlParsed);
 
+    const arbitraryMetadata = {};
+    if (desiredExportPaths) {
+        desiredExportPaths.forEach((path) => {
+            arbitraryMetadata[path] = _get(projectTomlParsed, path);
+        });
+    }
+
     return {
+        buildBackend: getBuildBackend(projectTomlParsed),
+        commands: commands,
+        directory: path.dirname(pyprojectPath),
         name: projectName,
         path: pyprojectPath,
-        directory: path.dirname(pyprojectPath),
-        buildBackend: getBuildBackend(projectTomlParsed),
         pythonVersion: pythonVersion,
-        commands: commands
+        ...arbitraryMetadata,
     };
 }
 

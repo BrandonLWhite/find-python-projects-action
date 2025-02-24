@@ -6,8 +6,8 @@ require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 
 const core = __nccwpck_require__(2186);
 
-const fs = __nccwpck_require__(3292);
-const path = __nccwpck_require__(1017);
+const fs = __nccwpck_require__(3977);
+const path = __nccwpck_require__(9411);
 
 const globby = __nccwpck_require__(3398);
 const TOML = __nccwpck_require__(2901);
@@ -17,6 +17,7 @@ module.exports = {
     run,
     findPythonProjects
 }
+const desiredExportPath = core.getInput('desired-export-path');
 
 async function run() {
     try {
@@ -48,7 +49,7 @@ async function findPythonProjects(rootDir) {
 
     for await (const candidatePath of candidatePaths) {
         const pyprojectPath = path.join(rootDir, candidatePath);
-        const project = await createProjectResult(pyprojectPath);
+        const project = await createProjectResult(pyprojectPath, desiredExportPath);
         projects.push(project);
     }
 
@@ -61,22 +62,37 @@ async function findPythonProjects(rootDir) {
     }
 }
 
-async function createProjectResult(pyprojectPath) {
+/**
+ * @param {string} pyprojectPath
+ * @param {string[]?} desiredExportPaths
+ */
+async function createProjectResult(pyprojectPath, desiredExportPaths) {
     const projectToml = await fs.readFile(pyprojectPath);
     const projectTomlParsed = TOML.parse(projectToml);
 
     const projectName = getBestConfig(projectTomlParsed, PROJECT_NAME_PATHS);
-    const pythonVersion = getBestConfig(projectTomlParsed, PYTHON_VERSION_PATHS);
+    const pythonVersion = getBestConfig(
+        projectTomlParsed,
+        PYTHON_VERSION_PATHS,
+    );
 
     const commands = generateCommands(projectTomlParsed);
 
+    const arbitraryMetadata = {};
+    if (desiredExportPaths) {
+        desiredExportPaths.forEach((path) => {
+            arbitraryMetadata[path] = _get(projectTomlParsed, path);
+        });
+    }
+
     return {
+        buildBackend: getBuildBackend(projectTomlParsed),
+        commands: commands,
+        directory: path.dirname(pyprojectPath),
         name: projectName,
         path: pyprojectPath,
-        directory: path.dirname(pyprojectPath),
-        buildBackend: getBuildBackend(projectTomlParsed),
         pythonVersion: pythonVersion,
-        commands: commands
+        ...arbitraryMetadata,
     };
 }
 
@@ -15013,14 +15029,6 @@ module.exports = require("fs");
 
 /***/ }),
 
-/***/ 3292:
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("fs/promises");
-
-/***/ }),
-
 /***/ 3685:
 /***/ ((module) => {
 
@@ -15042,6 +15050,22 @@ module.exports = require("https");
 
 "use strict";
 module.exports = require("net");
+
+/***/ }),
+
+/***/ 3977:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("node:fs/promises");
+
+/***/ }),
+
+/***/ 9411:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("node:path");
 
 /***/ }),
 
