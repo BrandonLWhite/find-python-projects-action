@@ -15,7 +15,7 @@ module.exports = {
 async function run() {
   try {
     const rootDir = core.getInput("root-dir");
-    const desiredExportPathsRaw = core.getInput("desired-export-paths");
+    const desiredExportPathsRaw = core.getInput("additional-export-paths");
     const desiredExportPaths =
       desiredExportPathsRaw === "" ? null : desiredExportPathsRaw.split(",");
 

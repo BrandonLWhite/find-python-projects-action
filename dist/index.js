@@ -21,13 +21,12 @@ module.exports = {
 async function run() {
   try {
     const rootDir = core.getInput("root-dir");
-    const desiredExportPathsRaw = core.getInput("desired-export-paths");
+    const desiredExportPathsRaw = core.getInput("additional-export-paths");
     const desiredExportPaths =
       desiredExportPathsRaw === "" ? null : desiredExportPathsRaw.split(",");
 
     core.info(`Searching in "${rootDir}" ...`);
 
-    console.log(`0 ${desiredExportPaths}`);
     const output = await findPythonProjects(rootDir, desiredExportPaths);
 
     core.setOutput("projects", JSON.stringify(output.projects));
@@ -46,7 +45,6 @@ async function run() {
  * @param {string[]?} desiredExportPaths
  */
 async function findPythonProjects(rootDir, desiredExportPaths) {
-  console.log(`1 ${desiredExportPaths}`);
   const globbyOpts = {
     gitignore: true,
   };

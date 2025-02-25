@@ -10,7 +10,7 @@ describe("find-python-projects", () => {
   const setOutputMock = jest.spyOn(core, "setOutput").mockImplementation();
 
   const inputsDefaults = {
-    "desired-export-paths": "",
+    "additional-export-paths": "",
   };
   let inputs = {};
   let outputs = {};
@@ -46,7 +46,7 @@ describe("find-python-projects", () => {
   });
 
   it("Exports keys as instructed", async () => {
-    inputs["desired-export-paths"] = "tool.export.me.please,what";
+    inputs["additional-export-paths"] = "tool.export.me.please,not.present";
     inputs["root-dir"] = "test-fixtures/project-with-exports";
     await run();
     expect(deserializeJsonValues(outputs)).toMatchSnapshot();
