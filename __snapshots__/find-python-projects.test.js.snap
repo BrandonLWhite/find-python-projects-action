@@ -1,5 +1,53 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`find-python-projects Exports keys as instructed 1`] = `
+{
+  "paths": [
+    "test-fixtures/project-with-exports/pyproject.toml",
+  ],
+  "projects": [
+    {
+      "buildBackend": "poetry.core.masonry.api",
+      "commands": {
+        "install": "poetry install",
+      },
+      "directory": "test-fixtures/project-with-exports",
+      "exports": {
+        "tool.export.me.please": {
+          "foo": "bar",
+          "one": 1,
+          "true": true,
+        },
+      },
+      "name": "single-project",
+      "path": "test-fixtures/project-with-exports/pyproject.toml",
+      "pythonVersion": "^3.9",
+    },
+  ],
+  "projects-by-command": {
+    "install": [
+      {
+        "buildBackend": "poetry.core.masonry.api",
+        "commands": {
+          "install": "poetry install",
+        },
+        "directory": "test-fixtures/project-with-exports",
+        "exports": {
+          "tool.export.me.please": {
+            "foo": "bar",
+            "one": 1,
+            "true": true,
+          },
+        },
+        "name": "single-project",
+        "path": "test-fixtures/project-with-exports/pyproject.toml",
+        "pythonVersion": "^3.9",
+      },
+    ],
+  },
+}
+`;
+
 exports[`find-python-projects finds projects 1`] = `
 {
   "paths": [
@@ -16,6 +64,7 @@ exports[`find-python-projects finds projects 1`] = `
         "install": "poetry install",
       },
       "directory": "test-fixtures/multi-project/project-1",
+      "exports": {},
       "name": "sub-project-1",
       "path": "test-fixtures/multi-project/project-1/pyproject.toml",
       "pythonVersion": "^3.9",
@@ -29,6 +78,7 @@ exports[`find-python-projects finds projects 1`] = `
         "test": "poetry run pytest",
       },
       "directory": "test-fixtures/multi-project/project-2",
+      "exports": {},
       "name": "sub-project-2",
       "path": "test-fixtures/multi-project/project-2/pyproject.toml",
       "pythonVersion": "^3.9",
@@ -38,6 +88,7 @@ exports[`find-python-projects finds projects 1`] = `
         "install": null,
       },
       "directory": "test-fixtures/multi-project/project-4",
+      "exports": {},
       "name": "sub-project-4",
       "path": "test-fixtures/multi-project/project-4/pyproject.toml",
       "pythonVersion": "^3.9",
@@ -49,6 +100,7 @@ exports[`find-python-projects finds projects 1`] = `
         "test": "pdm run test",
       },
       "directory": "test-fixtures/multi-project/project-5",
+      "exports": {},
       "name": "project-5",
       "path": "test-fixtures/multi-project/project-5/pyproject.toml",
       "pythonVersion": "==3.12.*",
@@ -60,6 +112,7 @@ exports[`find-python-projects finds projects 1`] = `
         "test": "poe test",
       },
       "directory": "test-fixtures/multi-project/project-6",
+      "exports": {},
       "name": "sub-project-6",
       "path": "test-fixtures/multi-project/project-6/pyproject.toml",
       "pythonVersion": "^3.9",
@@ -73,6 +126,7 @@ exports[`find-python-projects finds projects 1`] = `
           "install": "poetry install",
         },
         "directory": "test-fixtures/multi-project/project-1",
+        "exports": {},
         "name": "sub-project-1",
         "path": "test-fixtures/multi-project/project-1/pyproject.toml",
         "pythonVersion": "^3.9",
@@ -86,6 +140,7 @@ exports[`find-python-projects finds projects 1`] = `
           "test": "poetry run pytest",
         },
         "directory": "test-fixtures/multi-project/project-2",
+        "exports": {},
         "name": "sub-project-2",
         "path": "test-fixtures/multi-project/project-2/pyproject.toml",
         "pythonVersion": "^3.9",
@@ -97,6 +152,7 @@ exports[`find-python-projects finds projects 1`] = `
           "test": "pdm run test",
         },
         "directory": "test-fixtures/multi-project/project-5",
+        "exports": {},
         "name": "project-5",
         "path": "test-fixtures/multi-project/project-5/pyproject.toml",
         "pythonVersion": "==3.12.*",
@@ -108,6 +164,7 @@ exports[`find-python-projects finds projects 1`] = `
           "test": "poe test",
         },
         "directory": "test-fixtures/multi-project/project-6",
+        "exports": {},
         "name": "sub-project-6",
         "path": "test-fixtures/multi-project/project-6/pyproject.toml",
         "pythonVersion": "^3.9",
@@ -123,6 +180,7 @@ exports[`find-python-projects finds projects 1`] = `
           "test": "poetry run pytest",
         },
         "directory": "test-fixtures/multi-project/project-2",
+        "exports": {},
         "name": "sub-project-2",
         "path": "test-fixtures/multi-project/project-2/pyproject.toml",
         "pythonVersion": "^3.9",
@@ -138,6 +196,7 @@ exports[`find-python-projects finds projects 1`] = `
           "test": "poetry run pytest",
         },
         "directory": "test-fixtures/multi-project/project-2",
+        "exports": {},
         "name": "sub-project-2",
         "path": "test-fixtures/multi-project/project-2/pyproject.toml",
         "pythonVersion": "^3.9",
@@ -153,6 +212,7 @@ exports[`find-python-projects finds projects 1`] = `
           "test": "poetry run pytest",
         },
         "directory": "test-fixtures/multi-project/project-2",
+        "exports": {},
         "name": "sub-project-2",
         "path": "test-fixtures/multi-project/project-2/pyproject.toml",
         "pythonVersion": "^3.9",
@@ -164,6 +224,7 @@ exports[`find-python-projects finds projects 1`] = `
           "test": "pdm run test",
         },
         "directory": "test-fixtures/multi-project/project-5",
+        "exports": {},
         "name": "project-5",
         "path": "test-fixtures/multi-project/project-5/pyproject.toml",
         "pythonVersion": "==3.12.*",
@@ -175,6 +236,7 @@ exports[`find-python-projects finds projects 1`] = `
           "test": "poe test",
         },
         "directory": "test-fixtures/multi-project/project-6",
+        "exports": {},
         "name": "sub-project-6",
         "path": "test-fixtures/multi-project/project-6/pyproject.toml",
         "pythonVersion": "^3.9",

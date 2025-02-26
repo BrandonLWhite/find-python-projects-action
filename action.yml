@@ -9,7 +9,11 @@ inputs:
   root-dir:
     description: Directory root for where to begin recursively searching for projects.  Python projects contained in this directory or lower will be discovered.
     required: false
-    default: '.'
+    default: "."
+  additional-export-paths:
+    description: Additional TOML keys to export as part of the projects object. Specify them as json path strings, separated by commas. For example, "tool.upside.foo,bar.baz".
+    required: false
+    default: ""
 
 outputs:
   paths:
@@ -25,5 +29,5 @@ outputs:
     description: JSON array of all found projects (`project` object) that implement a `package` command
 
 runs:
-  using: 'node20'
-  main: 'dist/index.js'
+  using: "node20"
+  main: "dist/index.js"

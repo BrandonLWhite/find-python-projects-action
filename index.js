@@ -1,3 +1,3 @@
-const { run } = require('./find-python-projects')
+const { run } = require('./find-python-projects.js')
 
 run();

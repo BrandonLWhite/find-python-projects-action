@@ -12,6 +12,7 @@ This action aims to help you eliminate (or at least reduce) the amount of custom
 - **root-dir**: Directory root for where to begin recursively searching for projects.
 Python projects contained in this directory or lower will be discovered.  Defaults to your repository's root directory.
 
+- **additional-export-paths**: Additional TOML keys to export as part of the projects object. Specify them as json path strings, separated by commas. For example, "tool.foo.bar,baz.qux".
 
 ## Outputs
 - **paths**: JSON array of found project path strings
@@ -38,6 +39,8 @@ These are the fields for `project` objects in the output:
 
 - **commands**: Object with keys for each discovered command and the shell command as the value.
 This is dynamically constructed from the `pyproject.toml` content.
+
+- **exports**: Object with keys specified by the `additional-export-paths` input, and the structured TOML data (parsed as JSON) as the values.
 
 
 ## Project Commands
