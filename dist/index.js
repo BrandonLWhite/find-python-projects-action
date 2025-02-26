@@ -102,7 +102,7 @@ async function createProjectResult(pyprojectPath, desiredExportPaths) {
     name: projectName,
     path: pyprojectPath,
     pythonVersion: pythonVersion,
-    ...arbitraryMetadata,
+    exports: arbitraryMetadata,
   };
 }
 
