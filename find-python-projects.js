@@ -12,6 +12,8 @@ module.exports = {
   findPythonProjects,
 };
 
+const GLOBAL_KEY = "__GLOBAL__"; // reserved key for commands without a project specified
+
 async function run() {
   try {
     const rootDir = core.getInput("root-dir");
@@ -157,6 +159,54 @@ function generateCommands(projectTomlParsed) {
   }
 
   return commands;
+}
+
+/**
+ * Parse a GitHub Actions input representing what commands to skip for certain projects into
+ * a map of project → commandToSkip.
+ *
+ * Rules:
+ * - If a project is defined, the project name becomes the key, and the command is its value.
+ * - If no project is defined, the command goes under the reserved "__GLOBAL__" key.
+ *
+ * @param {string} skipsInput - The raw input string.
+ * @returns {Record<string, string[]>} Object mapping project (or "__GLOBAL__") to its commands to skip.
+ */
+function determineSkips(skipsInput) {
+  const lines = skipsInput
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
+
+  const skipsMap = {};
+  for (const line of lines) {
+    const pairs = line.split(",").map((p) => p.trim());
+
+    // Get an object where keys are what's before the `=` and values are
+    // what's after.
+    const kv = Object.fromEntries(
+      pairs.map((p) => {
+        const [k, v] = p.split("=", 2);
+        return [k.trim(), v?.trim()];
+      }),
+    );
+
+    let project = kv.project;
+    let command = kv.command;
+    if (project && !command) {
+      continue;
+    }
+
+    project = project ?? GLOBAL_KEY;
+    command = command ?? line.trim();
+
+    let entry = skipsMap[project];
+    if (!entry) {
+      entry = skipsMap[project] = [];
+    }
+    entry.push(command);
+  }
+  return skipsMap;
 }
 
 function determineInstallCommand(projectTomlParsed) {
