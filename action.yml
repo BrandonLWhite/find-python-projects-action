@@ -14,6 +14,26 @@ inputs:
     description: Additional TOML keys to export as part of the projects object. Specify them as json path strings, separated by commas. For example, "tool.upside.foo,bar.baz".
     required: false
     default: ""
+  exclude-commands:
+    description: |
+      Commands to exclude from being exported as part of the projects.
+
+      These excludes can be specified either as a string that will apply the exclude globally, or as multiple key-value pairs for certain projects.
+
+      For example, passing the string "test" will not export a detected test command from ANY project in the repo.
+
+      To exclude a command only from a certain project in the repo, use "project=" and "command=". For example, specifying the following:
+
+        exclude-commands: |
+          project=my-package-1,command=test
+          project=my-package-2,command=lint
+          project=my-package-1,command=install
+
+      would not export the "test" and "install" commands for "my-package-1" and the "lint" command for "my-package-2".
+
+      Mixing global and project-level excludes is valid.
+    required: false
+    default: ""
 
 outputs:
   paths:
