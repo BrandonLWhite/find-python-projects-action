@@ -11,6 +11,7 @@ describe("find-python-projects", () => {
 
   const inputsDefaults = {
     "additional-export-paths": "",
+    skipCommands: "",
   };
   let inputs = {};
   let outputs = {};

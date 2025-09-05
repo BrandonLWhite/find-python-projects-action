@@ -24,7 +24,8 @@ async function run() {
 
     core.info(`Searching in "${rootDir}" ...`);
 
-    const output = await findPythonProjects(rootDir, desiredExportPaths);
+    const skips = determineSkips(core.getInput("exclude-commands"));
+    const output = await findPythonProjects(rootDir, desiredExportPaths, skips);
 
     core.setOutput("projects", JSON.stringify(output.projects));
     core.setOutput(
@@ -40,8 +41,9 @@ async function run() {
 /**
  * @param {string} rootDir
  * @param {string[]?} desiredExportPaths
+ * @param {Object<string, string>} skips
  */
-async function findPythonProjects(rootDir, desiredExportPaths) {
+async function findPythonProjects(rootDir, desiredExportPaths, skips) {
   const globbyOpts = {
     gitignore: true,
   };
@@ -59,6 +61,7 @@ async function findPythonProjects(rootDir, desiredExportPaths) {
     const project = await createProjectResult(
       pyprojectPath,
       desiredExportPaths,
+      skips,
     );
     projects.push(project);
   }
@@ -73,8 +76,9 @@ async function findPythonProjects(rootDir, desiredExportPaths) {
 /**
  * @param {string} pyprojectPath
  * @param {string[]?} desiredExportPaths
+ * @param {Object<string, string>} skips
  */
-async function createProjectResult(pyprojectPath, desiredExportPaths) {
+async function createProjectResult(pyprojectPath, desiredExportPaths, skips) {
   const projectToml = await fs.readFile(pyprojectPath);
   const projectTomlParsed = TOML.parse(projectToml);
 
@@ -82,6 +86,16 @@ async function createProjectResult(pyprojectPath, desiredExportPaths) {
   const pythonVersion = getBestConfig(projectTomlParsed, PYTHON_VERSION_PATHS);
 
   const commands = generateCommands(projectTomlParsed);
+  const commandsFiltered = Object.fromEntries(
+    Object.entries(commands).filter(([commandName]) => {
+      const globalSkips = skips[GLOBAL_KEY] ?? [];
+      const projectSkips = skips[projectName] ?? [];
+      return (
+        !globalSkips.includes(commandName) &&
+        !projectSkips.includes(commandName)
+      );
+    }),
+  );
 
   const arbitraryMetadata = {};
   if (desiredExportPaths) {
@@ -92,7 +106,7 @@ async function createProjectResult(pyprojectPath, desiredExportPaths) {
 
   return {
     buildBackend: getBuildBackend(projectTomlParsed),
-    commands: commands,
+    commands: commandsFiltered,
     directory: path.dirname(pyprojectPath),
     name: projectName,
     path: pyprojectPath,
