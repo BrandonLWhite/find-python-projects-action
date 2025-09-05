@@ -8,8 +8,9 @@ const TOML = require("@iarna/toml");
 const _get = require("lodash/get.js");
 
 module.exports = {
-  run,
+  determineSkips,
   findPythonProjects,
+  run,
 };
 
 const GLOBAL_KEY = "__GLOBAL__"; // reserved key for commands without a project specified
