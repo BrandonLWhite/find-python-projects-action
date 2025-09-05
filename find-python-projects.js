@@ -64,8 +64,6 @@ async function findPythonProjects(rootDir, desiredExportPaths) {
     projects: projects,
     paths: projects.map((project) => project.path),
     projectsByCommand: getProjectsByCommand(projects),
-    testableProjects: projects.filter((project) => project.testCommand),
-    packageableProjects: projects.filter((project) => project.packageCommand),
   };
 }
 
