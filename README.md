@@ -1,28 +1,38 @@
 # find-python-projects-action
-Github Action for dynamically discovering Python projects in a repository and making available some helpful values from `pyproject.toml`, including CI/CD commands like `test`, for each project it finds.
+GitHub Action for dynamically discovering Python projects in a repository and making available some helpful values from `pyproject.toml`, including CI/CD commands like `test`, for each project it finds.
 
 Python projects are identified by the presence of `pyproject.toml`.
 Various pieces of information about each project are parsed from `pyproject.toml` and returned in the action outputs as JSON strings, including shell commands for additional CI type operations like `test` and `package`.
-This is meant to faciliate downstream actions or workflows such as matrix builds for parallel builds of each project.
+This is meant to facilitate downstream actions or workflows such as matrix builds for parallel builds of each project.
 
 This action aims to help you eliminate (or at least reduce) the amount of customization needed in your GHA workflows by pushing your project-specific stuff into `pyproject.toml`.
 
-
 ## Inputs
-- **root-dir**: Directory root for where to begin recursively searching for projects.
-Python projects contained in this directory or lower will be discovered.  Defaults to your repository's root directory.
 
-- **additional-export-paths**: Additional TOML keys to export as part of the projects object. Specify them as json path strings, separated by commas. For example, "tool.foo.bar,baz.qux".
+> `List` type is a newline-delimited string
+> ```yaml
+> exclude-commands: |
+>   project=my-package-1,command=test
+>   project=my-package-2,command=lint
+> ```
+
+> `CSV` type is a comma-delimited string
+> ```yaml
+> additional-export-paths: tool.foo.bar,baz.qux
+> ```
+
+| Input                     | Type        | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+|---------------------------|-------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `root-dir`                | string      | Directory root for where to begin recursively searching for projects. Python projects contained in this directory or lower will be discovered. Defaults to your repository's root directory.                                                                                                                                                                                                                                                                                                                                                         |
+| `additional-export-paths` | CSV         | Additional TOML keys to export as part of the projects object. Specify them as JSON path strings, separated by commas. For example, `"tool.foo.bar,baz.qux"`.                                                                                                                                                                                                                                                                                                                                                                                        |
+| `exclude-commands`        | string/List | Commands to exclude from processing during project discovery. Any plain string will be parsed as a command. For instance, passing "test" will cause the action to not export any information about "test" commands found in the repo. For project-specific overrides, pass a string of form `project=<name>,command=<name>`. For instance, a value of `project=one,command=lint` would cause the `lint` command to be excluded for a project named `one`, if such a project is discovered. Global and project-specific excludes can be freely mixed. |
 
 ## Outputs
-- **paths**: JSON array of found project path strings
-
-- **projects**: JSON array of all found projects ([project object](#project-object-output-shape))
-
-- **projects-by-command**: JSON object with keys corresponding to the name of discovered commands
-(eg `install`, `test`, `package`, etc.) in all projects, with an array value containing each
-[project object](#project-object-output-shape) that implements the command.
-
+| Output                | Type                          | Description                                                                                                                                                                                                                                                                                                                                                     |
+|-----------------------|-------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `paths`               | JSON array<string>            | JSON array of found project path strings.                                                                                                                                                                                                                                                                                                                       |
+| `projects`            | JSON array<project>           | JSON array of all found projects (see [project object](#project-object-output-shape)).                                                                                                                                                                                                                                                                          |
+| `projects-by-command` | JSON object<string, project[]> | JSON object with keys corresponding to the name of discovered commands (e.g., `install`, `test`, `package`, etc.) in all projects, with an array value containing each [project object](#project-object-output-shape) that implements the command.                                                                                                              |
 
 ## Project object output shape
 These are the fields for `project` objects in the output:
@@ -42,12 +52,10 @@ This is dynamically constructed from the `pyproject.toml` content.
 
 - **exports**: Object with keys specified by the `additional-export-paths` input, and the structured TOML data (parsed as JSON) as the values.
 
-
 ## Project Commands
 In the absence of Python standards for expressing internal project CI/CD/Dev operations, this action tries to unify the various known ways in the wild.
 
-This action will surface any command you specify in the pyproject.toml files.  Typically you'll
-want to define one or more of the following for your CI/CD system::
+This action will surface any command you specify in the pyproject.toml files.  Typically you'll want to define one or more of the following for your CI/CD system:
 
 - `test`
 - `package`
@@ -61,7 +69,7 @@ This action will pull the command from the first entry it finds in any of the fo
 - `[tool.poe.tasks]`: [poethepoet](https://github.com/nat-n/poethepoet)
 
 ### The `install` command
-This action perfoms special treatment for surfacing the `install` command.  Namely, if it is not explicitly specified, the action will attempt to generate a default based on the packaging backend (eg Poetry, PDM) that it discovers.
+This action performs special treatment for surfacing the `install` command.  Namely, if it is not explicitly specified, the action will attempt to generate a default based on the packaging backend (eg Poetry, PDM) that it discovers.
 The intent is that you do not need to specify an `install` command in your pyproject.toml, but you can if necessary.
 
 ### Where is the support for `[tool.poetry.scripts]`?
@@ -71,15 +79,11 @@ can leverage a task runner tool like [Poe](https://github.com/nat-n/poethepoet) 
 
 *If Poetry ever adds support for internal project (CI/CD/Dev) commands separate from published commands, then it will be added to this action.*
 
-
 ### Relevant References / Discussions
-https://discuss.python.org/t/a-new-pep-to-specify-dev-scripts-and-or-dev-scripts-providers-in-pyproject-toml/11457
-
-https://discuss.python.org/t/proposal-for-tests-entry-point-in-pyproject-toml/2077
-
-https://stackoverflow.com/questions/70386944/how-should-poetry-scripts-used-in-the-build-process-be-stored-in-the-project
-
-https://github.com/python-poetry/poetry/issues/3386
+- https://discuss.python.org/t/a-new-pep-to-specify-dev-scripts-and-or-dev-scripts-providers-in-pyproject-toml/11457
+- https://discuss.python.org/t/proposal-for-tests-entry-point-in-pyproject-toml/2077
+- https://stackoverflow.com/questions/70386944/how-should-poetry-scripts-used-in-the-build-process-be-stored-in-the-project
+- https://github.com/python-poetry/poetry/issues/3386
 
 ## Example Workflow
 [.github/workflows/examples/example.yml](.github/workflows/examples/example.yml)
