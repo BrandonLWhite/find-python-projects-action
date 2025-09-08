@@ -8,9 +8,12 @@ const TOML = require("@iarna/toml");
 const _get = require("lodash/get.js");
 
 module.exports = {
-  run,
+  determineSkips,
   findPythonProjects,
+  run,
 };
+
+const GLOBAL_KEY = "__GLOBAL__"; // reserved key for commands without a project specified
 
 async function run() {
   try {
@@ -21,7 +24,8 @@ async function run() {
 
     core.info(`Searching in "${rootDir}" ...`);
 
-    const output = await findPythonProjects(rootDir, desiredExportPaths);
+    const skips = determineSkips(core.getInput("exclude-commands"));
+    const output = await findPythonProjects(rootDir, desiredExportPaths, skips);
 
     core.setOutput("projects", JSON.stringify(output.projects));
     core.setOutput(
@@ -37,8 +41,9 @@ async function run() {
 /**
  * @param {string} rootDir
  * @param {string[]?} desiredExportPaths
+ * @param {Object<string, string>} skips
  */
-async function findPythonProjects(rootDir, desiredExportPaths) {
+async function findPythonProjects(rootDir, desiredExportPaths, skips) {
   const globbyOpts = {
     gitignore: true,
   };
@@ -56,6 +61,7 @@ async function findPythonProjects(rootDir, desiredExportPaths) {
     const project = await createProjectResult(
       pyprojectPath,
       desiredExportPaths,
+      skips,
     );
     projects.push(project);
   }
@@ -64,16 +70,15 @@ async function findPythonProjects(rootDir, desiredExportPaths) {
     projects: projects,
     paths: projects.map((project) => project.path),
     projectsByCommand: getProjectsByCommand(projects),
-    testableProjects: projects.filter((project) => project.testCommand),
-    packageableProjects: projects.filter((project) => project.packageCommand),
   };
 }
 
 /**
  * @param {string} pyprojectPath
  * @param {string[]?} desiredExportPaths
+ * @param {Object<string, string>} skips
  */
-async function createProjectResult(pyprojectPath, desiredExportPaths) {
+async function createProjectResult(pyprojectPath, desiredExportPaths, skips) {
   const projectToml = await fs.readFile(pyprojectPath);
   const projectTomlParsed = TOML.parse(projectToml);
 
@@ -81,6 +86,16 @@ async function createProjectResult(pyprojectPath, desiredExportPaths) {
   const pythonVersion = getBestConfig(projectTomlParsed, PYTHON_VERSION_PATHS);
 
   const commands = generateCommands(projectTomlParsed);
+  const commandsFiltered = Object.fromEntries(
+    Object.entries(commands).filter(([commandName]) => {
+      const globalSkips = skips[GLOBAL_KEY] ?? [];
+      const projectSkips = skips[projectName] ?? [];
+      return (
+        !globalSkips.includes(commandName) &&
+        !projectSkips.includes(commandName)
+      );
+    }),
+  );
 
   const arbitraryMetadata = {};
   if (desiredExportPaths) {
@@ -91,7 +106,7 @@ async function createProjectResult(pyprojectPath, desiredExportPaths) {
 
   return {
     buildBackend: getBuildBackend(projectTomlParsed),
-    commands: commands,
+    commands: commandsFiltered,
     directory: path.dirname(pyprojectPath),
     name: projectName,
     path: pyprojectPath,
@@ -159,6 +174,54 @@ function generateCommands(projectTomlParsed) {
   }
 
   return commands;
+}
+
+/**
+ * Parse a GitHub Actions input representing what commands to skip for certain projects into
+ * a map of project → commandToSkip.
+ *
+ * Rules:
+ * - If a project is defined, the project name becomes the key, and the command is its value.
+ * - If no project is defined, the command goes under the reserved "__GLOBAL__" key.
+ *
+ * @param {string} skipsInput - The raw input string.
+ * @returns {Record<string, string[]>} Object mapping project (or "__GLOBAL__") to its commands to skip.
+ */
+function determineSkips(skipsInput) {
+  const lines = skipsInput
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
+
+  const skipsMap = {};
+  for (const line of lines) {
+    const pairs = line.split(",").map((p) => p.trim());
+
+    // Get an object where keys are what's before the `=` and values are
+    // what's after.
+    const kv = Object.fromEntries(
+      pairs.map((p) => {
+        const [k, v] = p.split("=", 2);
+        return [k.trim(), v?.trim()];
+      }),
+    );
+
+    let project = kv.project;
+    let command = kv.command;
+    if (project && !command) {
+      continue;
+    }
+
+    project = project ?? GLOBAL_KEY;
+    command = command ?? line.trim();
+
+    let entry = skipsMap[project];
+    if (!entry) {
+      entry = skipsMap[project] = [];
+    }
+    entry.push(command);
+  }
+  return skipsMap;
 }
 
 function determineInstallCommand(projectTomlParsed) {

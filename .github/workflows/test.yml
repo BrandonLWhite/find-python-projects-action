@@ -11,7 +11,7 @@ jobs:
   units:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - run: npm ci
     - run: npm test
 
@@ -19,7 +19,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - uses: ./
       id: discover
       with:
@@ -42,14 +42,14 @@ jobs:
 
     steps:
       - name: Check out code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Dump project object
         run: |
           echo '${{ toJson(matrix.project) }}'
 
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version-file: ${{ matrix.project.path }}
 

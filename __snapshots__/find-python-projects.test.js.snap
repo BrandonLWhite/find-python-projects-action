@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`find-python-projects Exports keys as instructed 1`] = `
 {
@@ -41,6 +41,307 @@ exports[`find-python-projects Exports keys as instructed 1`] = `
         },
         "name": "single-project",
         "path": "test-fixtures/project-with-exports/pyproject.toml",
+        "pythonVersion": "^3.9",
+      },
+    ],
+  },
+}
+`;
+
+exports[`find-python-projects doesn't export commands we should globally skip 1`] = `
+{
+  "paths": [
+    "test-fixtures/multi-project/project-1/pyproject.toml",
+    "test-fixtures/multi-project/project-2/pyproject.toml",
+    "test-fixtures/multi-project/project-4/pyproject.toml",
+    "test-fixtures/multi-project/project-5/pyproject.toml",
+    "test-fixtures/multi-project/project-6/pyproject.toml",
+  ],
+  "projects": [
+    {
+      "buildBackend": "poetry.core.masonry.api",
+      "commands": {
+        "install": "poetry install",
+      },
+      "directory": "test-fixtures/multi-project/project-1",
+      "exports": {},
+      "name": "sub-project-1",
+      "path": "test-fixtures/multi-project/project-1/pyproject.toml",
+      "pythonVersion": "^3.9",
+    },
+    {
+      "buildBackend": "poetry.core.masonry.api",
+      "commands": {
+        "install": "poetry install",
+        "package": "poetry bundle venv .package/",
+        "something-arbitrary": "echo 'Example of arbitrary shell command'",
+      },
+      "directory": "test-fixtures/multi-project/project-2",
+      "exports": {},
+      "name": "sub-project-2",
+      "path": "test-fixtures/multi-project/project-2/pyproject.toml",
+      "pythonVersion": "^3.9",
+    },
+    {
+      "commands": {
+        "install": null,
+      },
+      "directory": "test-fixtures/multi-project/project-4",
+      "exports": {},
+      "name": "sub-project-4",
+      "path": "test-fixtures/multi-project/project-4/pyproject.toml",
+      "pythonVersion": "^3.9",
+    },
+    {
+      "buildBackend": "pdm.backend",
+      "commands": {
+        "install": "pdm install",
+      },
+      "directory": "test-fixtures/multi-project/project-5",
+      "exports": {},
+      "name": "project-5",
+      "path": "test-fixtures/multi-project/project-5/pyproject.toml",
+      "pythonVersion": "==3.12.*",
+    },
+    {
+      "buildBackend": "poetry.core.masonry.api",
+      "commands": {
+        "install": "poetry install",
+      },
+      "directory": "test-fixtures/multi-project/project-6",
+      "exports": {},
+      "name": "sub-project-6",
+      "path": "test-fixtures/multi-project/project-6/pyproject.toml",
+      "pythonVersion": "^3.9",
+    },
+  ],
+  "projects-by-command": {
+    "install": [
+      {
+        "buildBackend": "poetry.core.masonry.api",
+        "commands": {
+          "install": "poetry install",
+        },
+        "directory": "test-fixtures/multi-project/project-1",
+        "exports": {},
+        "name": "sub-project-1",
+        "path": "test-fixtures/multi-project/project-1/pyproject.toml",
+        "pythonVersion": "^3.9",
+      },
+      {
+        "buildBackend": "poetry.core.masonry.api",
+        "commands": {
+          "install": "poetry install",
+          "package": "poetry bundle venv .package/",
+          "something-arbitrary": "echo 'Example of arbitrary shell command'",
+        },
+        "directory": "test-fixtures/multi-project/project-2",
+        "exports": {},
+        "name": "sub-project-2",
+        "path": "test-fixtures/multi-project/project-2/pyproject.toml",
+        "pythonVersion": "^3.9",
+      },
+      {
+        "buildBackend": "pdm.backend",
+        "commands": {
+          "install": "pdm install",
+        },
+        "directory": "test-fixtures/multi-project/project-5",
+        "exports": {},
+        "name": "project-5",
+        "path": "test-fixtures/multi-project/project-5/pyproject.toml",
+        "pythonVersion": "==3.12.*",
+      },
+      {
+        "buildBackend": "poetry.core.masonry.api",
+        "commands": {
+          "install": "poetry install",
+        },
+        "directory": "test-fixtures/multi-project/project-6",
+        "exports": {},
+        "name": "sub-project-6",
+        "path": "test-fixtures/multi-project/project-6/pyproject.toml",
+        "pythonVersion": "^3.9",
+      },
+    ],
+    "package": [
+      {
+        "buildBackend": "poetry.core.masonry.api",
+        "commands": {
+          "install": "poetry install",
+          "package": "poetry bundle venv .package/",
+          "something-arbitrary": "echo 'Example of arbitrary shell command'",
+        },
+        "directory": "test-fixtures/multi-project/project-2",
+        "exports": {},
+        "name": "sub-project-2",
+        "path": "test-fixtures/multi-project/project-2/pyproject.toml",
+        "pythonVersion": "^3.9",
+      },
+    ],
+    "something-arbitrary": [
+      {
+        "buildBackend": "poetry.core.masonry.api",
+        "commands": {
+          "install": "poetry install",
+          "package": "poetry bundle venv .package/",
+          "something-arbitrary": "echo 'Example of arbitrary shell command'",
+        },
+        "directory": "test-fixtures/multi-project/project-2",
+        "exports": {},
+        "name": "sub-project-2",
+        "path": "test-fixtures/multi-project/project-2/pyproject.toml",
+        "pythonVersion": "^3.9",
+      },
+    ],
+  },
+}
+`;
+
+exports[`find-python-projects doesn't export commands we should skip for certain projects 1`] = `
+{
+  "paths": [
+    "test-fixtures/multi-project/project-1/pyproject.toml",
+    "test-fixtures/multi-project/project-2/pyproject.toml",
+    "test-fixtures/multi-project/project-4/pyproject.toml",
+    "test-fixtures/multi-project/project-5/pyproject.toml",
+    "test-fixtures/multi-project/project-6/pyproject.toml",
+  ],
+  "projects": [
+    {
+      "buildBackend": "poetry.core.masonry.api",
+      "commands": {
+        "install": "poetry install",
+      },
+      "directory": "test-fixtures/multi-project/project-1",
+      "exports": {},
+      "name": "sub-project-1",
+      "path": "test-fixtures/multi-project/project-1/pyproject.toml",
+      "pythonVersion": "^3.9",
+    },
+    {
+      "buildBackend": "poetry.core.masonry.api",
+      "commands": {
+        "install": "poetry install",
+        "package": "poetry bundle venv .package/",
+        "test": "poetry run pytest",
+      },
+      "directory": "test-fixtures/multi-project/project-2",
+      "exports": {},
+      "name": "sub-project-2",
+      "path": "test-fixtures/multi-project/project-2/pyproject.toml",
+      "pythonVersion": "^3.9",
+    },
+    {
+      "commands": {
+        "install": null,
+      },
+      "directory": "test-fixtures/multi-project/project-4",
+      "exports": {},
+      "name": "sub-project-4",
+      "path": "test-fixtures/multi-project/project-4/pyproject.toml",
+      "pythonVersion": "^3.9",
+    },
+    {
+      "buildBackend": "pdm.backend",
+      "commands": {},
+      "directory": "test-fixtures/multi-project/project-5",
+      "exports": {},
+      "name": "project-5",
+      "path": "test-fixtures/multi-project/project-5/pyproject.toml",
+      "pythonVersion": "==3.12.*",
+    },
+    {
+      "buildBackend": "poetry.core.masonry.api",
+      "commands": {
+        "install": "poetry install",
+        "test": "poe test",
+      },
+      "directory": "test-fixtures/multi-project/project-6",
+      "exports": {},
+      "name": "sub-project-6",
+      "path": "test-fixtures/multi-project/project-6/pyproject.toml",
+      "pythonVersion": "^3.9",
+    },
+  ],
+  "projects-by-command": {
+    "install": [
+      {
+        "buildBackend": "poetry.core.masonry.api",
+        "commands": {
+          "install": "poetry install",
+        },
+        "directory": "test-fixtures/multi-project/project-1",
+        "exports": {},
+        "name": "sub-project-1",
+        "path": "test-fixtures/multi-project/project-1/pyproject.toml",
+        "pythonVersion": "^3.9",
+      },
+      {
+        "buildBackend": "poetry.core.masonry.api",
+        "commands": {
+          "install": "poetry install",
+          "package": "poetry bundle venv .package/",
+          "test": "poetry run pytest",
+        },
+        "directory": "test-fixtures/multi-project/project-2",
+        "exports": {},
+        "name": "sub-project-2",
+        "path": "test-fixtures/multi-project/project-2/pyproject.toml",
+        "pythonVersion": "^3.9",
+      },
+      {
+        "buildBackend": "poetry.core.masonry.api",
+        "commands": {
+          "install": "poetry install",
+          "test": "poe test",
+        },
+        "directory": "test-fixtures/multi-project/project-6",
+        "exports": {},
+        "name": "sub-project-6",
+        "path": "test-fixtures/multi-project/project-6/pyproject.toml",
+        "pythonVersion": "^3.9",
+      },
+    ],
+    "package": [
+      {
+        "buildBackend": "poetry.core.masonry.api",
+        "commands": {
+          "install": "poetry install",
+          "package": "poetry bundle venv .package/",
+          "test": "poetry run pytest",
+        },
+        "directory": "test-fixtures/multi-project/project-2",
+        "exports": {},
+        "name": "sub-project-2",
+        "path": "test-fixtures/multi-project/project-2/pyproject.toml",
+        "pythonVersion": "^3.9",
+      },
+    ],
+    "test": [
+      {
+        "buildBackend": "poetry.core.masonry.api",
+        "commands": {
+          "install": "poetry install",
+          "package": "poetry bundle venv .package/",
+          "test": "poetry run pytest",
+        },
+        "directory": "test-fixtures/multi-project/project-2",
+        "exports": {},
+        "name": "sub-project-2",
+        "path": "test-fixtures/multi-project/project-2/pyproject.toml",
+        "pythonVersion": "^3.9",
+      },
+      {
+        "buildBackend": "poetry.core.masonry.api",
+        "commands": {
+          "install": "poetry install",
+          "test": "poe test",
+        },
+        "directory": "test-fixtures/multi-project/project-6",
+        "exports": {},
+        "name": "sub-project-6",
+        "path": "test-fixtures/multi-project/project-6/pyproject.toml",
         "pythonVersion": "^3.9",
       },
     ],
